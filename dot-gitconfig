@@ -1,8 +1,13 @@
 [user]
-	email = johnstonskj@gmail.com
 	name = Simon Johnston
+	email = johnstonskj@gmail.com
 	signingkey = 565B73DB6CC7F708
 [core]
 	editor = emacs
 [credential]
 	helper = cache --timeout=3600
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+	process = git-lfs filter-process

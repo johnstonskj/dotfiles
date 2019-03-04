@@ -1,3 +1,6 @@
+#! /usr/bin/env zsh
+
+export DOTFILES=${0:a:h}
 export DEVHOME=~/development
 
 if [ ! -d "$DEVHOME" ] ; then
@@ -10,10 +13,14 @@ apt list --upgradable
 
 # ********** tools **********
 echo System tools...
-sudo apt install tmux glances emacs-nox git
+sudo apt install tmux glances emacs-nox
 # https://github.com/tmuxinator/tmuxinator
 sudo apt install tmuxinator
-git config --global user.email "johnstonskj@gmail.com"
+
+# ********** tools **********
+sudo apt install git
+ln -s $DOTFILES/dot-gitconfig ~/.gitconfig
+ln -s $DOTFILES/dot-gitignore_global ~/.gitignore_global
 
 # ********** zsh **********
 echo zsh...

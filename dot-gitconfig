@@ -1,6 +1,7 @@
 [user]
 	email = johnstonskj@gmail.com
 	name = Simon Johnston
+	signingkey = 565B73DB6CC7F708
 [core]
 	editor = emacs
 [credential]

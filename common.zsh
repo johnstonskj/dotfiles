@@ -120,6 +120,16 @@ update_zsh() {
     upgrade_oh_my_zsh
 }
 
+install_vscode() {
+    if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	curl -o ~/Downloads/vscode.zip -L "https://go.microsoft.com/fwlink?LinkID=620882"
+	cd ~/Downloads
+	unzip vscode.zip
+	sudo mv "Visual Studio Code.app" /Applications
+	log-debug "!! leaving ~/Downloads/vscode.zip"
+    fi
+}
+
 install_nvidia_cuda() {
     if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	log-warning "Unsupported under MacOS"
@@ -132,6 +142,7 @@ install_nvidia_cuda() {
 	    log-debug "++ turning off Nouveau X drivers"
 	    sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
 	    sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
+	    log-debug "!! leaving ~/Downloads/NVIDIA-Linux-x86_64-418.43.run"
 	fi
 	log-info "++ reboot now for driver update"
 
@@ -140,5 +151,6 @@ install_nvidia_cuda() {
 	sudo sh cuda_10.1.105_418.39_linux.run
 	mkdir /media/simon/development/cuda
 	cuda-install-samples-10.1.sh /media/simon/development/cuda/
+	log-debug "!! leaving ~/Downloads/NVIDIA-Linux-x86_64-418.43.run"
     fi
 }

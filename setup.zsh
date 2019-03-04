@@ -31,3 +31,8 @@ install_nvidia_cuda
 
 log-info "Machine Leaning..."
 conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+
+if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
+    log-info "Work related install"
+    source "$DOTFILEDIR/work-setup.zsh"
+fi

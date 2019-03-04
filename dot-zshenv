@@ -11,3 +11,7 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
     export EDITOR='emacs'
 fi
+
+if [ -e "$DOTFILEDIR/work-zshenv" ] ; then
+    source "$DOTFILEDIR/work-zshenv"
+fi

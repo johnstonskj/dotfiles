@@ -110,3 +110,8 @@ export RACKETVERSION=7.1
 export RACKETHOME=/Applications/Racket\ v$RACKETVERSION
 export RACKETUSER=$HOME/Library/Racket/$RACKETVERSION
 export PATH=$PATH:$RACKETHOME/bin:$RACKETUSER/bin
+
+if [ -e "$DOTFILEDIR/work-zshrc" ] ; then
+    source "$DOTFILEDIR/work-zshrc"
+fi
+

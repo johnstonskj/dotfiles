@@ -157,6 +157,22 @@ install_vscode() {
     log-debug "!! leaving ~/Downloads/vscode.(deb|zip)"
 }
 
+install_docker() {
+    if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
+	open ~/Downloads/Docker.dmg
+	log-debug "!! leaving ~/Downloads/Docker.dmg"
+    else
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository \
+	     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+	        	 $(lsb_release -cs) \
+			    	 stable"
+	sudo apt-get update
+	sudo apt-get install docker-ce docker-ce-cli containerd.io
+    fi
+}
+
 install_nvidia_cuda() {
     if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	log-warning "Unsupported under MacOS"

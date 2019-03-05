@@ -47,9 +47,12 @@ COMPLETION_WAITING_DOTS="true"
 
 # Which plugins would you like to load?
 plugins=(git github gnu-utils python pip tmux)
-if [ `uname -s` = "Darwin"]
-then
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	plugins+=(osx)
+
+	if type brew &>/dev/null; then
+  	   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+	fi
 fi
 
 source $ZSH/oh-my-zsh.sh

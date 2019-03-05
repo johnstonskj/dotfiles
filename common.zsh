@@ -64,6 +64,16 @@ update_package_manager() {
     fi
 }
 
+cleanup_packages() {
+    update_package_manager
+    if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	brew cleanup
+	brew doctor
+    else
+	sudo apt autoremove
+    fi
+}
+
 install_package_for() {
     if [[ $OSTYPE = $1* ]] ; then
 	shift
@@ -85,6 +95,14 @@ update_package() {
     else
 	sudo apt upgrade $@
     fi
+}
+
+install_python() {
+    conda install --yes $@
+}
+
+install_racket() {
+    raco pkg install --deps search-auto $@
 }
 
 link_dot_file() {
@@ -122,12 +140,21 @@ update_zsh() {
 
 install_vscode() {
     if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
-	curl -o ~/Downloads/vscode.zip -L "https://go.microsoft.com/fwlink?LinkID=620882"
-	cd ~/Downloads
-	unzip vscode.zip
-	sudo mv "Visual Studio Code.app" /Applications
-	log-debug "!! leaving ~/Downloads/vscode.zip"
+        download="https://go.microsoft.com/fwlink?LinkID=620882"
+    else
+	download="https://go.microsoft.com/fwlink?LinkID=760868"
     fi
+    cd ~/Downloads
+    if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	curl -o ./vscode.zip -L $download
+	unzip ./vscode.zip
+	sudo mv "Visual Studio Code.app" /Applications
+    else
+	curl -o ./vscode.deb -L $download
+	sudo apt install ./vscode.deb
+	download="https://go.microsoft.com/fwlink?LinkID=760868"
+    fi
+    log-debug "!! leaving ~/Downloads/vscode.(deb|zip)"
 }
 
 install_nvidia_cuda() {
@@ -149,8 +176,8 @@ install_nvidia_cuda() {
 	log-debug "++ CUDA programming support..."
 	curl -o ~/Downloads/cuda_10.1.105_418.39_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
 	sudo sh cuda_10.1.105_418.39_linux.run
-	mkdir /media/simon/development/cuda
-	cuda-install-samples-10.1.sh /media/simon/development/cuda/
+	mkdir $DEVHOME/cuda
+	cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
 	log-debug "!! leaving ~/Downloads/NVIDIA-Linux-x86_64-418.43.run"
     fi
 }

@@ -25,12 +25,15 @@ install_package_for linux gcc
 install_package_for darwin kotlin
 install_package anaconda racket
 # curl -sSL https://get.rvm.io | bash -s stable
+install_package libzmq5
+install_racket iracket
+racket -l iracket/install
 
 log-info "NVIDIA CUDA..."
 install_nvidia_cuda
 
 log-info "Machine Leaning..."
-conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
     log-info "Work related install"

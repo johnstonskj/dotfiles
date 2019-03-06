@@ -8,7 +8,7 @@ install_package_manager
 update_package_manager
 
 log-info "System tools..."
-install_package docker parallel htop glances tmux
+install_package parallel htop glances tmux
 install_package_for linux emacs-nox
 install_package_for darwin emacs markdown-mode
 

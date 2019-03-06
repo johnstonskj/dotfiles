@@ -32,6 +32,9 @@ install_package libzmq5
 install_racket iracket
 racket -l iracket/install
 
+log-info "Container runtime..."
+install_docker
+
 log-info "NVIDIA CUDA..."
 install_nvidia_cuda
 

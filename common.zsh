@@ -138,6 +138,17 @@ update_zsh() {
     upgrade_oh_my_zsh
 }
 
+install_openssh_server() {
+    local SSHDCONF=/etc/ssh/sshd_config
+    if [[ $OSTYPE = linux* ]] ; then
+	install_package linux openssh-server
+	sudo mv $SSHDCONF $SSHDCONF.orig
+	sudo cat $SSHDCONF.orig | sed 's/#Port 22/Port 1337/g' > $SSHDCONF
+	sudo ufw allow 1337
+	sudo service ssh restart
+    fi
+}
+
 install_vscode() {
     if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
         download="https://go.microsoft.com/fwlink?LinkID=620882"

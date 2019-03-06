@@ -12,6 +12,9 @@ install_package docker parallel htop glances tmux
 install_package_for linux emacs-nox
 install_package_for darwin emacs markdown-mode
 
+log-info "OpenSSH server..."
+install_openssh_server
+
 log-info "Git"
 install_package git git-lfs
 link_dot_file dot-gitconfig $HOME/.gitconfig

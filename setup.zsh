@@ -9,6 +9,7 @@ update_package_manager
 
 log-info "System tools..."
 install_package parallel htop glances tmux
+install_package_for linux ethtool
 install_package_for linux emacs-nox
 install_package_for darwin emacs markdown-mode
 
@@ -40,6 +41,11 @@ install_nvidia_cuda
 
 log-info "Machine Leaning..."
 install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
+
+log-info "Random..."
+install_package hangups
+hangups --manual-login
+alias hangouts=hangups --col-scheme=solarized-dark
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
     log-info "Work related install"

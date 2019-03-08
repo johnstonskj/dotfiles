@@ -9,6 +9,7 @@ update_package_manager
 
 log-info "System tools..."
 install_package parallel htop glances tmux
+link_dot_file dot-tmux.conf $HOME/.tmux.conf
 install_package_for linux ethtool
 install_package_for linux emacs-nox
 install_package_for darwin emacs markdown-mode

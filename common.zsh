@@ -34,6 +34,14 @@ log-warning() { log 2 $@ }
 log-info() { log 3 $@ }
 log-debug() { log 4 $@ }
 
+os_customizations() {
+    if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	defaults write com.apple.dashboard devmode YES
+	defaults write com.apple.finder _FXShowPosixPathInTitle -bool YES
+	defaults write com.apple.Dock showhidden -bool YES
+    fi
+}
+
 create_development_dir() {
     if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	export DEVHOME=$HOME/Projects

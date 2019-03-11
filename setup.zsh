@@ -2,6 +2,8 @@
 
 DOTFILEDIR=${0:a:h}
 
+os_customizations
+
 create_development_dir
 
 install_package_manager

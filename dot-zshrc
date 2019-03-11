@@ -83,6 +83,8 @@ alias ll='ls -alF'
 alias weather='curl wttr.in'
 alias mcurl="curl --cert `whoami`"
 alias hd="od -tcx1"
+alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
+alias todo="find . -type f | xargs grep 'TODO:'"
 
 # -#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 # Package-specific customizations
@@ -116,7 +118,10 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
    export PATH=$PATH:$RACKETHOME/bin:$RACKETUSER/bin
 fi
 
+# -#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# Just in case......
+# -#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
 if [ -e "$DOTFILEDIR/work-zshrc" ] ; then
     source "$DOTFILEDIR/work-zshrc"
 fi
-

@@ -2,6 +2,10 @@
 
 DOTFILEDIR=${0:a:h}
 
+source $DOTFILEDIR/common.zsh
+
+parse_action $*
+
 os_customizations
 
 create_development_dir
@@ -31,10 +35,9 @@ log-info "Programming languages..."
 install_package_for linux gcc
 install_package_for darwin kotlin
 install_package anaconda racket
-# curl -sSL https://get.rvm.io | bash -s stable
 install_package libzmq5
 install_racket iracket
-racket -l iracket/install
+# racket -l iracket/install
 
 log-info "Container runtime..."
 install_docker
@@ -47,7 +50,7 @@ install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
 
 log-info "Random..."
 install_package hangups
-hangups --manual-login
+echo exec: hangups --manual-login
 alias hangouts=hangups --col-scheme=solarized-dark
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then

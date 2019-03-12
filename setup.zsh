@@ -1,10 +1,18 @@
 #! /usr/bin/env zsh
 
+############################################################################
+# Setup the process
+############################################################################
+
 DOTFILEDIR=${0:a:h}
 
 source $DOTFILEDIR/common.zsh
 
 parse_action $*
+
+############################################################################
+# Top-level configuration
+############################################################################
 
 os_customizations
 
@@ -13,10 +21,20 @@ create_development_dir
 install_package_manager
 update_package_manager
 
+############################################################################
+# Installation and configuration actions
+############################################################################
+
 log-info "System tools..."
-install_package parallel htop glances tmux
+install_package glances gpg htop parallel tmux
 link_dot_file dot-tmux.conf $HOME/.tmux.conf
+if [ ! -d $HOME/.gnupg ] ; then
+    log-info "++ GPG initialization..."
+    gpg --list-keys
+fi
 install_package_for linux ethtool
+
+log-info "Emacs..."
 install_package_for linux emacs-nox
 install_package_for darwin emacs markdown-mode
 

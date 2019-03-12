@@ -6,6 +6,7 @@
 
 DOTFILEDIR=${0:a:h}
 
+source $DOTFILEDIR/logging.zsh
 source $DOTFILEDIR/common.zsh
 
 parse_action $*

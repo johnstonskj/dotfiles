@@ -144,12 +144,16 @@ create_development_dir() {
 
 
 install_package_manager() {
+    # Note that right now we don't do anything with this, should
+    # really adjust the package manager and some other actions.
     if [[ $OSTYPE = linux* ]] ; then
 	if [[ $(grep -q "Red Hat" /proc/version) -eq 0 ]] ; then
-	    LX_PACKMAN=rpm
+	    log-info "OS Appears to be Red Hat flavored"
+	    LX_FLAVOR=redhat
+	else
+	    log-info "OS Appears to be Ubuntu flavored"
+	    LX_FLAVOR=ubuntu
 	fi
-    else
-	LX_PACKMAN=apt
     fi
     if [[ $ACTION = (install) ]] ; then
 	log-debug "installing package manager"

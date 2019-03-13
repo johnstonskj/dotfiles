@@ -36,6 +36,7 @@ if [ ! -d $HOME/.gnupg ] ; then
     gpg --list-keys
 fi
 install_package_for linux ethtool
+install_package_for darwin gnu-sed
 
 log-info "Emacs..."
 install_package_for linux emacs-nox

@@ -73,7 +73,7 @@ source $ZSH/oh-my-zsh.sh
 # Prompt/Environment customizations
 ############################################################################
 
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir vcs)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir dir_writable vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status battery ram load ssh background_jobs time)
 
 if [ -d "$HOME/bin" ] ; then
@@ -91,12 +91,22 @@ export ARCHFLAGS="-arch x86_64"
 
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
+############################################################################
+# Aliases
+############################################################################
+
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+   SED=gsed
+else
+   SED=sed
+fi
+
 alias ll='ls -alF'
 alias weather='curl wttr.in'
-alias mcurl="curl --cert `whoami`"
-alias hd="od -tcx1"
+alias mcurl='curl --cert `whoami`'
+alias hd='od -tcx1'
 alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
-alias todo="find . -type f | xargs grep 'TODO:'"
+alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
 
 ############################################################################
 # Package-specific customizations

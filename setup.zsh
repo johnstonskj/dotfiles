@@ -72,8 +72,10 @@ log-info "Machine Leaning..."
 install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
 
 log-info "Random..."
-install_package hangups
-echo exec: hangups --manual-login
+snap install slack
+snap install cloudprint
+snap install gitkracken
+snap install hangups
 alias hangouts=hangups --col-scheme=solarized-dark
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then

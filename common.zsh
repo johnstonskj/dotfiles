@@ -153,7 +153,7 @@ link_dot_file() {
 install_zsh() {
     if [[ $ACTION = (install) ]] ; then
 	log-debug "++ zsh"
-	install_package zsh
+	install_package zsh zsh-completions
 	sudo chsh -s `which zsh`
     fi
     
@@ -265,4 +265,16 @@ install_nvidia_cuda() {
 	    log-debug "!! leaving ~/Downloads/NVIDIA-Linux-x86_64-418.43.run"
 	fi
     fi
+}
+
+
+############################################################################
+# Experimental stuff
+############################################################################
+
+install_music() {
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --if-not-exists nuvola https://dl.tiliado.eu/flatpak/nuvola.flatpakrepo
+    flatpak update
+    flatpak install nuvola eu.tiliado.Nuvola
 }

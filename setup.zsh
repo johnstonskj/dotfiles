@@ -29,7 +29,7 @@ update_package_manager
 ############################################################################
 
 log-info "System tools..."
-install_package glances gpg htop parallel tmux
+install_package glances gpg htop lynx parallel tmux
 link_dot_file dot-tmux.conf $HOME/.tmux.conf
 if [ ! -d $HOME/.gnupg ] ; then
     log-info "++ GPG initialization..."

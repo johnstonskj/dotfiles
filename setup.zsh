@@ -17,8 +17,10 @@ parse_action $*
 
 os_customizations
 
+log-info "Setting up development directory..."
 create_development_dir
 
+log-info "Installing/Upating package manager..."
 install_package_manager
 update_package_manager
 
@@ -51,7 +53,8 @@ log-info "Zshell..."
 install_zsh
 
 log-info "Programming languages..."
-install_package_for linux gcc
+install_package_for linux gcc make
+# echo exec: xcode-select --install
 install_package_for darwin kotlin
 install_package anaconda racket
 install_package libzmq5

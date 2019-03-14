@@ -60,19 +60,17 @@ install_package_manager() {
     # Note that right now we don't do anything with this, should
     # really adjust the package manager and some other actions.
     if [[ $OSTYPE = linux* ]] ; then
-	if [[ $(grep -q "Red Hat" /proc/version) -eq 0 ]] ; then
-	    log-info "OS Appears to be Red Hat flavored"
-	    LX_FLAVOR=redhat
-	else
-	    log-info "OS Appears to be Ubuntu flavored"
-	    LX_FLAVOR=ubuntu
+	if [ -r /etc/os-release ]; then
+	    LXDIST="$(. /etc/os-release && echo "$ID")"
 	fi
     fi
     if [[ $ACTION = (install) ]] ; then
-	log-debug "installing package manager"
+	log-debug "installing homebrew package manager"
 	if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	    if [ ! -d "/usr/local/Homebrew" ]; then
 		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+		brew tap 'homebrew/services'
+		brew services
 	    fi
 	fi
     fi
@@ -112,9 +110,18 @@ install_package_for() {
 install_package() {
     if [[ $ACTION = (install) ]] ; then
 	if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
-	    brew install $@
+	    if [[ "$1" = "-app" ]] ; then
+		shift
+		brew cask install $@
+	    else
+		brew install $@
+	    fi
 	else
-	    sudo apt install $@
+	    if [[ "$1" = "-app" ]] ; then
+		snap install $@
+	    else
+		sudo apt install $@
+	    fi
 	fi
     fi
 }
@@ -153,8 +160,12 @@ link_dot_file() {
 install_zsh() {
     if [[ $ACTION = (install) ]] ; then
 	log-debug "++ zsh"
-	install_package zsh
-	sudo chsh -s `which zsh`
+	install_package zsh zsh-completions
+	local _shellloc=`which zsh`
+	if [[ $(grep -q $_shelloc /etc/shells) -ne 0 ]] ; then
+	    sudo cat /etc/shells | sed -e "\$a$_shellloc" >/etc/shells
+	fi
+	sudo chsh -s $_shellloc
     fi
     
     if [[ $ACTION = (install|update|link) ]] ; then
@@ -205,20 +216,14 @@ install_vscode() {
 	local linkid
 	if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
             download="https://go.microsoft.com/fwlink?LinkID=620882"
-	else
-	    download="https://go.microsoft.com/fwlink?LinkID=760868"
-	fi
-	cd ~/Downloads
-	if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+	    cd ~/Downloads
 	    curl -o ./vscode.zip -L "https://go.microsoft.com/fwlink?LinkID=$linkid"
 	    unzip ./vscode.zip
 	    sudo mv "Visual Studio Code.app" /Applications
+	    log-debug "!! leaving ~/Downloads/vscode.zip"
 	else
-	    curl -o ./vscode.deb -L "https://go.microsoft.com/fwlink?LinkID=$linkid"
-	    sudo apt install ./vscode.deb
-	    download="https://go.microsoft.com/fwlink?LinkID=760868"
+	    install_package -app vscode
 	fi
-	log-debug "!! leaving ~/Downloads/vscode.(deb|zip)"
     fi
 }
 
@@ -229,13 +234,19 @@ install_docker() {
 	    open ~/Downloads/Docker.dmg
 	    log-debug "!! leaving ~/Downloads/Docker.dmg"
 	else
+	    install_package apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 	    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	    sudo add-apt-repository \
-		 "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-	        		    $(lsb_release -cs) \
-			    	 st able"
-	    sudo apt-get update
-	    sudo apt-get install docker-ce docker-ce-cli containerd.io
+	    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	    update_package_manager
+	    install_package docker-ce docker-ce-cli containerd.io
+	    sudo groupadd docker
+	    sudo usermod -aG docker $USER
+	    if [ -e "$HOME/.docker" ] ; then
+
+	    sudo chown "$USER":"$USER" "$HOME/.docker" -R
+	    sudo chmod g+rwx "$HOME/.docker" -R
+	    sudo systemctl enable docker
+	    echo_instruction "docker run hello-world"
 	fi
     fi
 }
@@ -265,4 +276,16 @@ install_nvidia_cuda() {
 	    log-debug "!! leaving ~/Downloads/NVIDIA-Linux-x86_64-418.43.run"
 	fi
     fi
+}
+
+
+############################################################################
+# Experimental stuff
+############################################################################
+
+install_music() {
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --if-not-exists nuvola https://dl.tiliado.eu/flatpak/nuvola.flatpakrepo
+    flatpak update
+    flatpak install nuvola eu.tiliado.Nuvola
 }

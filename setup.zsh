@@ -49,8 +49,7 @@ log-info "Git"
 install_package git git-lfs
 link_dot_file dot-gitconfig $HOME/.gitconfig
 link_dot_file dot-gitignore_global $HOME/.gitignore_global
-install_package_for darwin hub
-install_package_for darwin -app hub
+install_package_for linux hub
 log-info "Zshell..."
 install_zsh
 
@@ -84,7 +83,7 @@ curl -o $HOME/Downloads/protonvpn-us.ovpn "https://account.protonvpn.com/api/vpn
 log-info "Random Applications..."
 install_package_for linux -app cloudprint gitkracken hangups slack
 alias hangouts=hangups --col-scheme=solarized-dark
-install_package_for darwin -app iterm2 chrome
+install_package_for darwin -app iterm2 google-chrome github
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
     log-info "Work related installs..."

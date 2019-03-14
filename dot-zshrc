@@ -73,6 +73,8 @@ source $ZSH/oh-my-zsh.sh
 # Prompt/Path/Environment customizations
 ############################################################################
 
+# would like  for link dir
+
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir dir_writable vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status battery ram load ssh background_jobs time)
 

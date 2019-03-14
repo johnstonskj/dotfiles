@@ -73,12 +73,14 @@ source $ZSH/oh-my-zsh.sh
 # Prompt/Path/Environment customizations
 ############################################################################
 
+POWERLEVEL9K_DIR_FOREGROUND="white" # This currently doesn't work :(
+
 POWERLEVEL9K_DIR_LINK_ICON="\uf838" # 
 POWERLEVEL9K_DIR_LINK_FOREGROUND=$POWERLEVEL9K_DIR_FOREGROUND
 POWERLEVEL9K_DIR_LINK_BACKGROUND=$POWERLEVEL9K_DIR_BACKGROUND
 
 prompt_dir_link() {
-    if [ -h `pwd` ] ; then
+    if [ -h $PWD ] ; then
 	echo -n "$POWERLEVEL9K_DIR_LINK_ICON "
     else
 	echo -n "";

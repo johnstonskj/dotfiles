@@ -73,10 +73,24 @@ source $ZSH/oh-my-zsh.sh
 # Prompt/Path/Environment customizations
 ############################################################################
 
-# would like  for link dir
+POWERLEVEL9K_DIR_LINK_ICON="\uf838" # 
+POWERLEVEL9K_DIR_LINK_FOREGROUND=$POWERLEVEL9K_DIR_FOREGROUND
+POWERLEVEL9K_DIR_LINK_BACKGROUND=$POWERLEVEL9K_DIR_BACKGROUND
 
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir dir_writable vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status battery ram load ssh background_jobs time)
+prompt_dir_link() {
+    if [ -h `pwd` ] ; then
+	echo -n "$POWERLEVEL9K_DIR_LINK_ICON "
+    else
+	echo -n "";
+    fi
+}
+
+POWERLEVEL9K_DISK_USAGE_ONLY_WARNING=true
+POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=85
+POWERLEVEL9K_SHORTEN_DELIMITER=\u22ef # ⋯
+
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir dir_writable dir_link vcs)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status battery disk_usage ram load ssh background_jobs time)
 
 if [ -d "$HOME/bin" ] ; then
     PATH=$HOME/bin:$PATH

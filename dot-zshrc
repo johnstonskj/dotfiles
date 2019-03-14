@@ -70,19 +70,19 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 ############################################################################
-# Prompt/Environment customizations
+# Prompt/Path/Environment customizations
 ############################################################################
 
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon root_indicator context dir dir_writable vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status battery ram load ssh background_jobs time)
 
 if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
+    PATH=$HOME/bin:$PATH
 fi
 
 if [ -d "/usr/local" ] ; then
-    PATH="/usr/local/bin:/usr/local/sbin:$PATH"
-    export MANPATH="/usr/local/man:$MANPATH"
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/sbin:$PATH
+    export MANPATH=/usr/local/man:$MANPATH
 fi
 
 export EDITOR='emacs'

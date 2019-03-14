@@ -42,5 +42,17 @@ log-info() { log 3 $@ }
 log-debug() { log 4 $@ }
 
 echo_bright() {
-    echo $fg_bold[white]$1$_reset_color
+    echo $fg_bold[white]$1$reset_color
 }
+
+echo_instruction() {
+    echo $fg[green]perform manual action:$reset_color \$ $1
+}
+
+echo_instruction_for() {
+    if [[ $OSTYPE = $1* && $ACTION = (install) ]] ; then
+	shift
+	echo_instruction $@
+    fi
+}
+

@@ -88,15 +88,32 @@ parse_action() {
 }
 
 ############################################################################
+# Wrappers
+############################################################################
+
+run_command() {
+    log-info "executing: $@"
+    errfile=$(mktemp)
+    out=$($@ 2>|"$errfile" )
+    err=$(< "$errfile")
+    rm "$errfile"
+   
+    res=("${(@f)out}")
+    for s in $res; do log-debug $s; done
+    res=("${(@f)err}")
+    for s in $res; do log-warning $s; done
+}
+
+############################################################################
 # Actions
 ############################################################################
 
 os_customizations() {
     if [[ $OSSYS = macos && $ACTION = install ]] ; then
 	log-debug "Writing common defaults"
-	defaults write com.apple.dashboard devmode YES
-	defaults write com.apple.finder _FXShowPosixPathInTitle -bool YES
-	defaults write com.apple.Dock showhidden -bool YES
+	run_command defaults write com.apple.dashboard devmode YES
+	run_command defaults write com.apple.finder _FXShowPosixPathInTitle -bool YES
+	run_command defaults write com.apple.Dock showhidden -bool YES
     fi
 }
 
@@ -107,7 +124,7 @@ create_development_dir() {
 	export DEVHOME=$HOME/development
     fi
     if [ ! -d "$DEVHOME" ] ; then
-	mkdir $DEVHOME
+	run_command mkdir $DEVHOME
     fi
 }
 
@@ -116,29 +133,29 @@ install_package_manager() {
 	log-debug "installing homebrew package manager"
 	if [[ $OSSYS = darwin ]] ; then
 	    if [ ! -d "/usr/local/Homebrew" ]; then
-		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-		brew tap 'homebrew/services'
-		brew services
+		run_command /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+		run_command brew tap 'homebrew/services'
+		run_command brew services
 	    fi
 	fi
     fi
     if [[ $ACTION = update ]] ; then
 	log-debug "updating package managers"
-	$INSTALLER $ACTION
+	run_command $INSTALLER $ACTION
 	if [[ $OSSYS = linux ]] ; then
 	    log-debug "+++ updating $INSTALLER"
-	    $INSTALLER list --upgradable
+	    run_command $INSTALLER list --upgradable
 	fi
 	log-debug "+++ running package manager cleanup actions"
 	if [[ $OSSYS = macos ]] ; then
-	    $INSTALLER cleanup
+	    run_command $INSTALLER cleanup
 	    # and maybe ... $INSTALLER doctor
 	else
-	    $INSTALLER autoremove
+	    run_command $INSTALLER autoremove
 	fi
 	# Upgrade conda
 	log-debug "+++ updating conda"
-	conda $ACTION -n base -c defaults conda
+	run_command conda $ACTION -n base -c defaults conda
     fi
 }
 
@@ -167,18 +184,18 @@ install_package() {
 	in
 	    -app)
 		shift
-		$APP_INSTALLER $_action $@
+		run_command $APP_INSTALLER $_action $@
 		;;
 	    -python)
 		shift
-		conda $ACTION --yes $@
+		run_command conda $ACTION --yes $@
 		;;
 	    -racket)
 		shift
-		raco pkg $ACTION --deps search-auto $@
+		run_command raco pkg $ACTION --deps search-auto $@
 		;;
 	    *)
-		$INSTALLER $_action $@ ;;
+		run_command $INSTALLER $_action $@ ;;
 	esac
     fi
 }
@@ -197,13 +214,7 @@ install_gpg() {
 	install_package gpg
 	if [ ! -d $HOME/.gnupg ] ; then
 	    log-info "++ GPG initialization..."
-	    while read -r line ; do
-		if [[ $line = *WARNING* ]] ; then
-		    log-warning $line
-		else
-		    log-info $line
-		fi
-	    done < <(gpg --list-keys 2>&1)
+	    run_command gpg --list-keys
 	fi
     fi
 }
@@ -214,9 +225,9 @@ install_zsh() {
 	install_package zsh zsh-completions
 	local _shellloc=`which zsh`
 	if [[ $(grep -q $_shelloc /etc/shells) -ne 0 ]] ; then
-	    sudo cat /etc/shells | sed -e "\$a$_shellloc" >/etc/shells
+	    run_command sudo cat /etc/shells | sed -e "\$a$_shellloc" >/etc/shells
 	fi
-	sudo chsh -s $_shellloc
+	run_command sudo chsh -s $_shellloc
     fi
     
     if [[ $ACTION = update ]] ; then
@@ -231,12 +242,12 @@ install_zsh() {
     
     if [[ $ACTION = install ]] ; then
 	log-debug "++ oh-my-zsh"
-	sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+	run_command sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	export ZSH=~/.oh-my-zsh
 	
 	log-debug "++ oh-my-zsh plugins"
-	git clone https://github.com/bhilburn/powerlevel9k.git $ZSH/custom/themes/powerlevel9k
-	git clone https://github.com/zsh-users/zsh-docker.git $ZSH/custom/plugins/zsh-docker
+	run_command git clone https://github.com/bhilburn/powerlevel9k.git $ZSH/custom/themes/powerlevel9k
+	run_command git clone https://github.com/zsh-users/zsh-docker.git $ZSH/custom/plugins/zsh-docker
 	
 	log-debug "++ powerline fonts"
 	if [[ $OSSYS = macos ]] ; then
@@ -252,10 +263,10 @@ install_openssh_server() {
     if [[ $OSSYS = linux && $ACTION = install ]] ; then
 	local SSHDCONF=/etc/ssh/sshd_config
 	install_package linux openssh-server
-	sudo mv $SSHDCONF $SSHDCONF.orig
-	sudo cat $SSHDCONF.orig | sed 's/#Port 22/Port 1337/g' > $SSHDCONF
-	sudo ufw allow 1337
-	sudo service ssh restart
+	run_command sudo mv $SSHDCONF $SSHDCONF.orig
+	run_command sudo cat $SSHDCONF.orig | sed 's/#Port 22/Port 1337/g' > $SSHDCONF
+	run_command sudo ufw allow 1337
+	run_command sudo service ssh restart
     fi
 }
 
@@ -267,10 +278,10 @@ install_proton_vpn() {
 	    _country = $1
 	fi
 	install_package_for linux openvpn network-manager-openvpn-gnome resolvconf
-	curl -o ~/Downloads/protonvpn-$_country.ovpn "https://account.protonvpn.com/api/vpn/config?APIVersion=3&Country=$_country&Platform=Linux&Protocol=udp"
+	run_command curl -o ~/Downloads/protonvpn-$_country.ovpn "https://account.protonvpn.com/api/vpn/config?APIVersion=3&Country=$_country&Platform=Linux&Protocol=udp"
 	# from https://protonvpn.com/support/linux-vpn-tool/
-	curl -o ~/Downloads/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
-	sudo zsh ~/Downloads/protonvpn-cli.sh --install
+	run_command curl -o ~/Downloads/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
+	run_command sudo zsh ~/Downloads/protonvpn-cli.sh --install
 	log-debug "!! leaving ~/Downloads/protonvpn-$_country.ovpn and ~/Downloads/protonvpn-cli.sh"
     fi
 }
@@ -278,22 +289,22 @@ install_proton_vpn() {
 install_docker() {
     if [[ $ACTION = install ]] ; then
 	if [[ $OSSYS = macos ]] ; then
-	    curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
-	    open ~/Downloads/Docker.dmg
+	    run_command curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
+	    run_command open ~/Downloads/Docker.dmg
 	    log-debug "!! leaving ~/Downloads/Docker.dmg"
 	else
 	    install_package apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-	    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	    run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	    run_command sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	    update_package_manager
 	    install_package docker-ce docker-ce-cli containerd.io
-	    sudo groupadd docker
-	    sudo usermod -aG docker $USER
+	    run_command sudo groupadd docker
+	    run_command sudo usermod -aG docker $USER
 	    if [ -e "$HOME/.docker" ] ; then
-		sudo chown "$USER":"$USER" "$HOME/.docker" -R
-		sudo chmod g+rwx "$HOME/.docker" -R
+		run_command sudo chown "$USER":"$USER" "$HOME/.docker" -R
+		run_command sudo chmod g+rwx "$HOME/.docker" -R
 	    fi
-	    sudo systemctl enable docker
+	    run_command sudo systemctl enable docker
 	    echo_instruction "docker run hello-world"
 	fi
     fi
@@ -302,25 +313,25 @@ install_docker() {
 install_nvidia_cuda() {
     if [[ $ACTION = install ]] ; then
 	if [[ $OSSYS = macos ]] ; then
-	    log-warning "Unsupported under MacOS"
+	    log-warning "CUDA unsupported under MacOS"
 	else
 	    log-debug "++ graphics drivers"
 	    local NVVER=`nvidia-smi |grep Version |awk '{ print $6 }'`
 	    if [ ! "$NVVER"  = "418.43" ]; then
-		curl -o ~/Downloads/nvidia_linux.run "http://us.download.nvidia.com/XFree86/Linux-x86_64/418.43/NVIDIA-Linux-x86_64-418.43.run"
-		sudo sh nvidia_linux.run
+		run_command curl -o ~/Downloads/nvidia_linux.run "http://us.download.nvidia.com/XFree86/Linux-x86_64/418.43/NVIDIA-Linux-x86_64-418.43.run"
+		run_command sudo sh nvidia_linux.run
 		log-debug "++ turning off Nouveau X drivers"
-		sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
-		sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
+		run_command sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
+		run_command sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
 		log-debug "!! leaving ~/Downloads/nvidia_linux.run"
 	    fi
 	    echo_instruction "reboot now for driver update"
 	    
 	    log-debug "++ CUDA programming support..."
-	    curl -o ~/Downloads/cuda_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
-	    sudo sh cuda_linux.run
-	    mkdir $DEVHOME/cuda
-	    cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
+	    run_command curl -o ~/Downloads/cuda_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
+	    run_command sudo sh cuda_linux.run
+	    run_command mkdir $DEVHOME/cuda
+	    run_command cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
 	    log-debug "!! leaving ~/Downloads/cuda_linux.run"
 	fi
     fi

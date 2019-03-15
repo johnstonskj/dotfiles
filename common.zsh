@@ -32,9 +32,7 @@ decode_os_type() {
 	*)
 	    log-error "Unknown OS $OSSYS unsupported"
 	    ;;
-    esac
-    
-    log-debug "OS=$OSSYS ($OSTYPE) DIST=$OSDIST VERSION=$OSVERSION ARCH=$OSARCH"
+    esac    
 }
 
 ACTION=install
@@ -64,7 +62,7 @@ parse_action() {
 	     parse_action $1;;
 	*)   ACTION=install;;
     esac
-    log-info "Performing $ACTION on $OSSYS";
+    log-info "Performing $ACTION on $OSSYS ($OSTYPE) DIST=$OSDIST VERSION=$OSVERSION ARCH=$OSARCH"
 }
 
 ############################################################################

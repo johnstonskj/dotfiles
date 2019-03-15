@@ -202,10 +202,7 @@ install_package() {
 
 link_dot_file() {
     if [[ $ACTION = (install|update|link) ]] ; then
-	STDOUT=`ln -s $DOTFILEDIR/$1 $2 2>&1`
-	if [[ $? -ne 0 ]] ; then
-	    log-warning $STDOUT
-	fi
+	run_command ln -s $DOTFILEDIR/$1 $2
     fi
 }
 

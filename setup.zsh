@@ -9,6 +9,8 @@ DOTFILEDIR=${0:a:h}
 source $DOTFILEDIR/logging.zsh
 source $DOTFILEDIR/common.zsh
 
+decode_os_type
+
 parse_action $*
 
 ############################################################################
@@ -22,7 +24,6 @@ create_development_dir
 
 log-info "Installing/Upating package manager..."
 install_package_manager
-update_package_manager
 
 ############################################################################
 # Installation and configuration actions
@@ -36,11 +37,11 @@ if [ ! -d $HOME/.gnupg ] ; then
     gpg --list-keys
 fi
 install_package_for linux ethtool
-install_package_for darwin gnu-sed
+install_package_for macos gnu-sed
 
 log-info "Emacs..."
 install_package_for linux emacs-nox
-install_package_for darwin emacs markdown-mode
+install_package_for macos emacs markdown-mode
 
 log-info "OpenSSH server..."
 install_openssh_server
@@ -50,19 +51,23 @@ install_package git git-lfs
 link_dot_file dot-gitconfig $HOME/.gitconfig
 link_dot_file dot-gitignore_global $HOME/.gitignore_global
 install_package_for linux hub
+
 log-info "Zshell..."
 install_zsh
 
 log-info "Programming languages..."
 install_package_for linux gcc make racket
-echo_instruction_for darwin "xcode-select --install"
-install_package_for darwin kotlin minimal-racket
-install_package_for darwin rust rustup-init rust-completion
+echo_instruction_for macos "xcode-select --install"
+install_package_for macos kotlin minimal-racket
+install_package_for macos rust rustup-init rust-completion
 install_package_for linux rustc rust-doc rust-gdb rust-lldb
 install_package anaconda 
 install_package libzmq5
 install_racket iracket
 echo_instruction "racket -l iracket/install"
+
+install_package_for macos -app visual-studio-code
+install_package_for linux -app vscode
 
 log-info "Container runtime..."
 install_docker
@@ -74,16 +79,12 @@ log-info "Machine Leaning..."
 install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
 
 log-info "Proton VPN..."
-install_package_for linux openvpn network-manager-openvpn-gnome resolvconf
-curl -o $HOME/Downloads/protonvpn-us.ovpn "https://account.protonvpn.com/api/vpn/config?APIVersion=3&Country=US&Platform=Linux&Protocol=udp"
-# from https://protonvpn.com/support/linux-vpn-tool/
-# curl -o $HOME/Downloads/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
-# sudo zsh $HOME/Downloads/protonvpn-cli.sh --install
+install_proton_vpn "US"
 
 log-info "Random Applications..."
 install_package_for linux -app cloudprint gitkracken hangups slack
 alias hangouts=hangups --col-scheme=solarized-dark
-install_package_for darwin -app iterm2 google-chrome github
+install_package_for macos -app iterm2 google-chrome github
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
     log-info "Work related installs..."

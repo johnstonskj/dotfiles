@@ -181,6 +181,22 @@ link_dot_file() {
     fi
 }
 
+install_gpg() {
+    if [[ $ACTION = (install|upgrade) ]] ; then
+	install_package gpg
+	if [ ! -d $HOME/.gnupg ] ; then
+	    log-info "++ GPG initialization..."
+	    while read -r line ; do
+		if [[ $line = *WARNING* ]] ; then
+		    log-warning $line
+		else
+		    log-info $line
+		fi
+	    done < <(gpg --list-keys 2>&1)
+	fi
+    fi
+}
+
 install_zsh() {
     if [[ $ACTION = install ]] ; then
 	log-debug "++ zsh"

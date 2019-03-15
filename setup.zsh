@@ -30,14 +30,11 @@ install_package_manager
 ############################################################################
 
 log-info "System tools..."
-install_package glances gpg htop lynx parallel tmux
+install_package glances htop lynx parallel tmux
 link_dot_file dot-tmux.conf $HOME/.tmux.conf
-if [ ! -d $HOME/.gnupg ] ; then
-    log-info "++ GPG initialization..."
-    gpg --list-keys
-fi
 install_package_for linux ethtool
 install_package_for macos gnu-sed
+install_gpg
 
 log-info "Emacs..."
 install_package_for linux emacs-nox

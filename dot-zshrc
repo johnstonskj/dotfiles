@@ -121,6 +121,7 @@ alias mcurl='curl --cert `whoami`'
 alias hd='od -tcx1'
 alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
 alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
+alias hangouts='hangups --col-scheme=solarized-dark'
 
 ############################################################################
 # Package-specific customizations

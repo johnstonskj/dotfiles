@@ -33,6 +33,28 @@ decode_os_type() {
 	    log-error "Unknown OS $OSSYS unsupported"
 	    ;;
     esac    
+
+    if [[ $OSSYS = macos ]] ; then
+	INSTALLER='brew'
+	APP_INSTALLER='brew cask'
+	UPDATER='upgrade'
+    elif [[ $OSSYS = linux ]] ; then
+	STDOUT=`yum --version`
+	if [[ $? -eq 0 ]] ; then
+	    log-debug "You appear to be running a redhat derived Linux"
+	    INSTALLER='sudo yum'
+	    APP_INSTALLER=snap
+	else
+	    STDOUT=`apt-get --version`
+	    if [[ $? -eq 0 ]] ; then
+		INSTALLER='sudo apt-get'
+		APP_INSTALLER=flatpack
+	    else
+		log-critical "No known installer (yum|apt-get) found"
+	    fi
+	fi
+	UPDATER=
+    fi
 }
 
 ACTION=install
@@ -89,26 +111,7 @@ create_development_dir() {
     fi
 }
 
-
 install_package_manager() {
-    # Note that right now we don't do anything with this, should
-    # really adjust the package manager and some other actions.
-    if [[ $OSSYS = linux ]] ; then
-	STDOUT=`yum --version`
-	if [[ $? -eq 0 ]] ; then
-	    log-debug "You appear to be running a redhat derived Linux"
-	    INSTALLER='sudo yum'
-	    APP_INSTALLER=snap
-	else
-	    STDOUT=`apt-get --version`
-	    if [[ $? -eq 0 ]] ; then
-		INSTALLER='sudo apt-get'
-		APP_INSTALLER=flatpack
-	    else
-		log-critical "No known installer (yum|apt-get) found"
-	    fi
-	fi
-    fi
     if [[ $ACTION = install ]] ; then
 	log-debug "installing homebrew package manager"
 	if [[ $OSSYS = darwin ]] ; then
@@ -118,28 +121,32 @@ install_package_manager() {
 		brew services
 	    fi
 	fi
-	INSTALLER=brew
-	APP_INSTALLER='brew cask'
     fi
     if [[ $ACTION = update ]] ; then
-	log-debug "updating package manager"
+	log-debug "updating package managers"
 	$INSTALLER $ACTION
 	if [[ $OSSYS = linux ]] ; then
+	    log-debug "+++ updating $INSTALLER"
 	    $INSTALLER list --upgradable
 	fi
-    fi
-}
-
-cleanup_packages() {
-    if [[ $ACTION = update ]] ; then
-	update_package_manager
+	log-debug "+++ running package manager cleanup actions"
 	if [[ $OSSYS = macos ]] ; then
 	    $INSTALLER cleanup
-	    $INSTALLER doctor
+	    # and maybe ... $INSTALLER doctor
 	else
 	    $INSTALLER autoremove
 	fi
+	# Upgrade conda
+	log-debug "+++ updating conda"
+	conda $ACTION -n base -c defaults conda
     fi
+}
+
+update_package_manager() {
+    local old=$ACTION
+    ACTION=update
+    install_package_manager
+    ACTION=$old
 }
 
 install_package_for() {
@@ -150,25 +157,29 @@ install_package_for() {
 }
 
 install_package() {
-    if [[ $ACTION = install ]] ; then
-	if [[ "$1" = "-app" ]] ; then
-	    shift
-	    $APP_INSTALLER $ACTION $@
-	else
-	    $INSTALLER $ACTION $@
+    if [[ $ACTION = (install|update) ]] ; then
+	local _action=$ACTION
+	if [[ $ACTION = update && $UPDATER != "" ]] ; then
+	    _action=$UPDATER
 	fi
-    fi
-}
-
-install_python() {
-    if [[ $ACTION = install ]] ; then
-	conda install --yes $@
-    fi
-}
-
-install_racket() {
-    if [[ $ACTION = install ]] ; then
-	raco pkg install --deps search-auto $@
+	log-debug "Performing $_action for $@"
+	case $1
+	in
+	    -app)
+		shift
+		$APP_INSTALLER $_action $@
+		;;
+	    -python)
+		shift
+		conda $ACTION --yes $@
+		;;
+	    -racket)
+		shift
+		raco pkg $ACTION --deps search-auto $@
+		;;
+	    *)
+		$INSTALLER $_action $@ ;;
+	esac
     fi
 }
 
@@ -209,8 +220,7 @@ install_zsh() {
     fi
     
     if [[ $ACTION = update ]] ; then
-	update_package zsh
-	upgrade_oh_my_zsh
+	install_package zsh
     fi
 
     if [[ $ACTION = (install|update|link) ]] ; then

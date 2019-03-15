@@ -59,8 +59,9 @@ install_package_for macos kotlin minimal-racket
 install_package_for macos rust rustup-init rust-completion
 install_package_for linux rustc rust-doc rust-gdb rust-lldb
 install_package anaconda 
-install_package libzmq5
-install_racket iracket
+install_package_for linux libzmq5
+install_package_for macos zeromq
+install_package -racket iracket
 echo_instruction "racket -l iracket/install"
 
 install_package_for macos -app visual-studio-code
@@ -73,15 +74,19 @@ log-info "NVIDIA CUDA..."
 install_nvidia_cuda
 
 log-info "Machine Leaning..."
-install_python pytorch torchvision cudatoolkit=10.0 -c pytorch
+install_package -python pytorch torchvision -c pytorch
+install_package_for linux -python cudatoolkit=10.0 
 
 log-info "Proton VPN..."
 install_proton_vpn "US"
 
 log-info "Random Applications..."
 install_package_for linux -app cloudprint gitkracken hangups slack
-alias hangouts=hangups --col-scheme=solarized-dark
 install_package_for macos -app iterm2 google-chrome github
+
+############################################################################
+# non-Git delegated configuration
+############################################################################
 
 if [ -e "$DOTFILEDIR/work-setup.zsh" ] ; then
     log-info "Work related installs..."

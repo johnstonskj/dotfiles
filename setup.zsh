@@ -53,12 +53,12 @@ log-info "Zshell..."
 install_zsh
 
 log-info "Programming languages..."
+install_anaconda
 install_package_for linux gcc make racket
 echo_instruction_for macos "xcode-select --install"
 install_package_for macos kotlin minimal-racket
 install_package_for macos rust rustup-init rust-completion
 install_package_for linux rustc rust-doc rust-gdb rust-lldb
-install_package anaconda 
 install_package_for linux libzmq5
 install_package_for macos zeromq
 install_package -racket iracket

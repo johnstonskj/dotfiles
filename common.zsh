@@ -6,6 +6,9 @@ OSSYS=`uname -s | tr '[:upper:]' '[:lower:]'`
 OSDIST=
 OSVERSION=`uname -r`
 OSARCH=`uname -m`
+INSTALLER=
+APP_INSTALLER=
+UPDATER=
 
 decode_os_type() {
     case "$OSSYS" in
@@ -19,10 +22,10 @@ decode_os_type() {
 	linux)
 	    # If available, use LSB to identify distribution
 	    if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
-		OSDIST=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+		OSDIST=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'// | tr '[:upper:]' '[:lower:]')
 	    else
 		# Otherwise, use release info file
-		OSDIST=$(ls -d /etc/[A-Za-z]*[_-](version|release) | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1 | grep -v system)
+		OSDIST=$(ls -d /etc/[A-Za-z]*[_-](version|release) | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1 | grep -v system | tr '[:upper:]' '[:lower:]')
 	    fi
 	    ;;
 	msys*)
@@ -35,25 +38,25 @@ decode_os_type() {
     esac    
 
     if [[ $OSSYS = macos ]] ; then
-	INSTALLER='brew'
-	APP_INSTALLER='brew cask'
-	UPDATER='upgrade'
+	INSTALLER=brew
+	APP_INSTALLER=(brew cask)
     elif [[ $OSSYS = linux ]] ; then
-	STDOUT=`yum --version`
+	STDOUT=$(yum --version 2>&1)
 	if [[ $? -eq 0 ]] ; then
 	    log-debug "You appear to be running a redhat derived Linux"
-	    INSTALLER='sudo yum'
-	    APP_INSTALLER=snap
+	    INSTALLER=(sudo yum --assumeyes)
+	    APP_INSTALLER=flatpack
 	else
-	    STDOUT=`apt-get --version`
+	    STDOUT=$(apt --version 2>&1)
 	    if [[ $? -eq 0 ]] ; then
-		INSTALLER='sudo apt-get'
-		APP_INSTALLER=flatpack
+		log-debug "You appear to be running a debian derived Linux"
+		INSTALLER=(sudo apt --assume-yes)
+		APP_INSTALLER=snap
+		UPDATER=upgrade
 	    else
 		log-critical "No known installer (yum|apt-get) found"
 	    fi
 	fi
-	UPDATER=
     fi
 }
 
@@ -84,7 +87,8 @@ parse_action() {
 	     parse_action $1;;
 	*)   ACTION=install;;
     esac
-    log-info "Performing $ACTION on $OSSYS ($OSTYPE) DIST=$OSDIST VERSION=$OSVERSION ARCH=$OSARCH"
+    log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
+    log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
 }
 
 ############################################################################
@@ -92,7 +96,7 @@ parse_action() {
 ############################################################################
 
 run_command() {
-    log-info "executing: $@"
+    log-info "executing: ${(j. .)@}"
     errfile=$(mktemp)
     out=$($@ 2>|"$errfile" )
     err=$(< "$errfile")
@@ -142,10 +146,6 @@ install_package_manager() {
     if [[ $ACTION = update ]] ; then
 	log-debug "updating package managers"
 	run_command $INSTALLER $ACTION
-	if [[ $OSSYS = linux ]] ; then
-	    log-debug "+++ updating $INSTALLER"
-	    run_command $INSTALLER list --upgradable
-	fi
 	log-debug "+++ running package manager cleanup actions"
 	if [[ $OSSYS = macos ]] ; then
 	    run_command $INSTALLER cleanup
@@ -153,9 +153,6 @@ install_package_manager() {
 	else
 	    run_command $INSTALLER autoremove
 	fi
-	# Upgrade conda
-	log-debug "+++ updating conda"
-	run_command conda $ACTION -n base -c defaults conda
     fi
 }
 
@@ -164,6 +161,22 @@ update_package_manager() {
     ACTION=update
     install_package_manager
     ACTION=$old
+}
+
+install_anaconda() {
+    if [[  $ACTION = install ]] ; then
+	if [[ $OSSYS = linux ]] ; then
+	    run_command curl -o ~/Downloads/anaconda.sh "https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh"
+	elif [[ $ACTION = macos ]] ; then
+	    run_command curl -o ~/Downloads/anaconda.sh "https://repo.anaconda.com/archive/Anaconda3-2018.12-MacOSX-x86_64.sh"
+	fi
+	run_command open ~/Downloads/anaconda.sh
+	log-debug "!! leaving ~/Downloads/anaconda.sh"
+    fi
+    if [[ $ACTION = update ]] ; then
+	log-debug "+++ updating conda"
+	run_command conda $ACTION -n base -c defaults conda
+    fi
 }
 
 install_package_for() {
@@ -179,7 +192,7 @@ install_package() {
 	if [[ $ACTION = update && $UPDATER != "" ]] ; then
 	    _action=$UPDATER
 	fi
-	log-debug "Performing $_action for $@"
+	log-debug "Performing $_action for ${(j. .)@}"
 	case $1
 	in
 	    -app)

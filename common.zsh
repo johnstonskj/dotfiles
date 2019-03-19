@@ -318,6 +318,11 @@ install_docker() {
 	    echo_instruction "docker run hello-world"
 	fi
     fi
+    if [[ $ACTION = (install|update) ]] ; then
+	while IFS= read -r line; do
+	    run_command docker pull $line
+	done < "$DOTFILEDIR/docker-images"
+    fi
 }
 
 install_nvidia_cuda() {

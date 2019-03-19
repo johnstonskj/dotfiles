@@ -297,31 +297,35 @@ install_proton_vpn() {
 }
 
 install_docker() {
-    if [[ $ACTION = install ]] ; then
+    if [[ $ACTION = (install|update) ]] ; then
 	if [[ $OSSYS = macos ]] ; then
 	    run_command curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
 	    run_command open ~/Downloads/Docker.dmg
 	    log-debug "!! leaving ~/Downloads/Docker.dmg"
 	else
 	    install_package apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-	    run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	    run_command sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-	    update_package_manager
-	    install_package docker-ce docker-ce-cli containerd.io
-	    run_command sudo groupadd docker
-	    run_command sudo usermod -aG docker $USER
-	    if [ -e "$HOME/.docker" ] ; then
-		run_command sudo chown "$USER":"$USER" "$HOME/.docker" -R
-		run_command sudo chmod g+rwx "$HOME/.docker" -R
+	    if [[ $ACTION = install ]] ; then
+		run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+		run_command sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+		update_package_manager
 	    fi
-	    run_command sudo systemctl enable docker
-	    echo_instruction "docker run hello-world"
+	    install_package docker-ce docker-ce-cli containerd.io
+	    if [[ $ACTION = install ]] ; then
+		run_command sudo groupadd docker
+		run_command sudo usermod -aG docker $USER
+		if [ -e "$HOME/.docker" ] ; then
+		    run_command sudo chown "$USER":"$USER" "$HOME/.docker" -R
+		    run_command sudo chmod g+rwx "$HOME/.docker" -R
+		fi
+		run_command sudo systemctl enable docker
+	    fi
 	fi
-    fi
-    if [[ $ACTION = (install|update) ]] ; then
 	while IFS= read -r line; do
 	    run_command docker pull $line
 	done < "$DOTFILEDIR/docker-images"
+    fi
+    if [[ $ACTION = install ]] ; then
+	echo_instruction "docker run hello-world"
     fi
 }
 
@@ -332,7 +336,7 @@ install_nvidia_cuda() {
 	else
 	    log-debug "++ graphics drivers"
 	    local NVVER=`nvidia-smi |grep Version |awk '{ print $6 }'`
-	    if [ ! "$NVVER"  = "418.43" ]; then
+	    if [ $NVVER  != "418.43" ]; then
 		run_command curl -o ~/Downloads/nvidia_linux.run "http://us.download.nvidia.com/XFree86/Linux-x86_64/418.43/NVIDIA-Linux-x86_64-418.43.run"
 		run_command sudo sh nvidia_linux.run
 		log-debug "++ turning off Nouveau X drivers"
@@ -344,8 +348,8 @@ install_nvidia_cuda() {
 	    
 	    log-debug "++ CUDA programming support..."
 	    run_command curl -o ~/Downloads/cuda_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
-	    run_command sudo sh cuda_linux.run
-	    run_command mkdir $DEVHOME/cuda
+	    run_command sudo sh ~/Downloads/cuda_linux.run
+	    run_command mkdir -p $DEVHOME/cuda
 	    run_command cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
 	    log-debug "!! leaving ~/Downloads/cuda_linux.run"
 	fi

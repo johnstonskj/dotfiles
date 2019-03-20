@@ -43,20 +43,20 @@ install_package_for macos emacs markdown-mode
 log-info "OpenSSH..."
 install_openssh
 
-log-info "Git"
+log-info "Git..."
 install_package git git-lfs
 link_dot_file dot-gitconfig $HOME/.gitconfig
 link_dot_file dot-gitignore_global $HOME/.gitignore_global
-install_package_for linux hub
+install_package_for linux git-hub
+install_package -app gitkraken
+# maybe one day - https://github.com/sickill/git-dude
 
 log-info "Zshell..."
 install_zsh
 
 log-info "Programming languages (linux)..."
-install_package_for linux gcc make racket
+install_package_for linux gcc make racket anaconda
 install_package_for linux rustc rust-doc rust-gdb rust-lldb
-install_package_for linux anaconda 
-install_package_for linux libzmq5
 install_package_for linux -app vscode
 
 log-info "Programming languages (macos)..."
@@ -65,8 +65,6 @@ install_package_for macos kotlin minimal-racket
 install_package_for macos rust rustup-init rust-completion
 install_package_for macos -app anaconda
 echo_instruction "ln -s /usr/local/anaconda3 $HOME/anaconda3"
-
-install_package_for macos zeromq
 install_package_for macos -app visual-studio-code
 
 log-info "Programming languages (shared)..."

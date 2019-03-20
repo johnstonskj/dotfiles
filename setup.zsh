@@ -37,9 +37,13 @@ install_package_for macos gnu-sed
 install_gpg
 
 log-info "Emacs..."
-install_package_for linux emacs-nox
+install_package_for linux emacs-nox elpa-racket-mode
 install_package_for macos emacs markdown-mode
-
+if [ ! -d "$DEVHOME" ] ; then
+    run_command mkdir -p $HOME/.emacs.d/lib
+fi
+link_dot_file init.el $HOME/.emacs.d/init.el
+run_command curl -o $HOME/.emacs.d/lib/scribble.el "https://www.neilvandyke.org/scribble-emacs/scribble.el"
 log-info "OpenSSH..."
 install_openssh
 

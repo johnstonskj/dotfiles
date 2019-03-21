@@ -162,12 +162,17 @@ fi
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
-#>>>>>>>>>>  Racket
+#>>>>>>>>>> Racket
 export RACKETVERSION=7.1
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
    export RACKETHOME=/Applications/Racket\ v$RACKETVERSION
    export RACKETUSER=$HOME/Library/Racket/$RACKETVERSION
    export PATH=$PATH:$RACKETHOME/bin:$RACKETUSER/bin
+fi
+
+#>>>>>>>>>> iTerm2
+if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
+     source "${HOME}/.iterm2_shell_integration.zsh"
 fi
 
 ############################################################################
@@ -178,3 +183,5 @@ if [ -e "$DOTFILEDIR/work-zshrc" ] ; then
     echo "Running work configuration"
     source "$DOTFILEDIR/work-zshrc"
 fi
+
+

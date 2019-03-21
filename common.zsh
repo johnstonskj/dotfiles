@@ -249,12 +249,9 @@ install_zsh() {
 
     if [[ $ACTION = (install|update) ]] ; then
 	log-debug "+++ adding powerline fonts"
-	if [[ $OSSYS = macos ]] ; then
-	    install_package homebrew/cask-fonts/font-meslo-nerd-font
-	    install_package homebrew/cask-fonts/font-meslo-nerd-font-mono
-	else
-	    install_package fonts-powerline
-	fi
+	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font
+	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font-mono
+	install_package_for linux fonts-powerline
     fi
 }
 
@@ -294,7 +291,7 @@ install_proton_vpn() {
 install_docker() {
     if [[ $ACTION = (install|update) ]] ; then
 	if [[ $OSSYS = macos ]] ; then
-	    log-debug "+++ installing Docker desktop (from disk image)"
+xo	    log-debug "+++ installing Docker desktop (from disk image)"
 	    run_command curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
 	    run_command open ~/Downloads/Docker.dmg
 	    log-debug "!!! leaving ~/Downloads/Docker.dmg"
@@ -329,6 +326,36 @@ install_docker() {
     fi
 }
 
+install_emacs() {
+    if [[ $ACTION = (install|update) ]] ; then
+	install_package_for linux emacs-nox elpa-racket-mode
+	install_package_for macos emacs markdown-mode rust-mode
+	install_package_for macos -app font-linux-libertine
+    fi
+    if [[ $ACTION = (install|update|link) ]] ; then
+	if [ ! -d "$DEVHOME" ] ; then
+	    run_command mkdir -p $HOME/.emacs.d/lib
+	fi
+    fi
+    if [[ $ACTION = (install|update) ]] ; then
+	link_dot_file init.el $HOME/.emacs.d/init.el
+	run_command curl -o $HOME/.emacs.d/lib/scribble.el "https://www.neilvandyke.org/scribble-emacs/scribble.el"
+    fi
+}
+
+install_git() {
+    if [[ $ACTION = (install|update) ]] ; then
+	install_package git git-lfs
+	install_package -app gitkraken
+	install_package_for linux git-hub
+	# maybe one day - https://github.com/sickill/git-dude
+    fi
+    if [[ $ACTION = (install|update|link) ]] ; then
+	link_dot_file dot-gitconfig $HOME/.gitconfig
+	link_dot_file dot-gitignore_global $HOME/.gitignore_global
+    fi
+}
+
 install_nvidia_cuda() {
     if [[ $ACTION = install ]] ; then
 	if [[ $OSSYS = macos ]] ; then
@@ -353,5 +380,11 @@ install_nvidia_cuda() {
 	    run_command cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
 	    log-debug "!!! leaving ~/Downloads/cuda_linux.run"
 	fi
+    fi
+}
+
+install_tex() {
+    if [[ $ACTION = (install|update) ]] ; then
+	install_package_for macos -app mactex texpad
     fi
 }

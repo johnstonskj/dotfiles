@@ -34,34 +34,22 @@ install_package glances htop lynx parallel tmux
 link_dot_file dot-tmux.conf $HOME/.tmux.conf
 install_package_for linux ethtool
 install_package_for macos gnu-sed
+
 install_gpg
-
-log-info "Emacs..."
-install_package_for linux emacs-nox elpa-racket-mode
-install_package_for macos emacs markdown-mode
-if [ ! -d "$DEVHOME" ] ; then
-    run_command mkdir -p $HOME/.emacs.d/lib
-fi
-link_dot_file init.el $HOME/.emacs.d/init.el
-run_command curl -o $HOME/.emacs.d/lib/scribble.el "https://www.neilvandyke.org/scribble-emacs/scribble.el"
-log-info "OpenSSH..."
-install_openssh
-
-log-info "Git..."
-install_package git git-lfs
-link_dot_file dot-gitconfig $HOME/.gitconfig
-link_dot_file dot-gitignore_global $HOME/.gitignore_global
-install_package_for linux git-hub
-install_package -app gitkraken
-# maybe one day - https://github.com/sickill/git-dude
-
-log-info "Zshell..."
 install_zsh
+install_openssh
+install_docker
+install_proton_vpn "US"
+
+log-info "Development Environment..."
+install_emacs
+install_git
 
 log-info "Programming languages (linux)..."
 install_package_for linux gcc make racket anaconda
 install_package_for linux rustc rust-doc rust-gdb rust-lldb
 install_package_for linux -app vscode
+install_package_for linux -app intellij-idea-community --classic
 
 log-info "Programming languages (macos)..."
 echo_instruction_for macos "xcode-select --install"
@@ -69,14 +57,11 @@ install_package_for macos kotlin minimal-racket
 install_package_for macos rust rustup-init rust-completion
 install_package_for macos -app anaconda
 echo_instruction "ln -s /usr/local/anaconda3 $HOME/anaconda3"
-install_package_for macos -app visual-studio-code
+install_package_for macos -app visual-studio-code intellij-idea-ce
 
 log-info "Programming languages (shared)..."
 install_package -racket iracket
 echo_instruction "racket -l iracket/install"
-
-log-info "Docker runtime..."
-install_docker
 
 log-info "NVIDIA CUDA..."
 install_nvidia_cuda
@@ -85,12 +70,11 @@ log-info "Machine Leaning..."
 install_package -python pytorch torchvision -c pytorch
 install_package_for linux -python cudatoolkit=10.0 
 
-log-info "Proton VPN..."
-install_proton_vpn "US"
-
-log-info "Random Applications..."
-install_package_for linux -app cloudprint gitkracken hangups slack
-install_package_for macos -app iterm2 google-chrome github
+log-info "Desktop/Productivity Applications..."
+install_package -app slack spotify
+install_package_for linux -app cloudprint hangups
+install_package_for macos -app iterm2 google-chrome wireshark tidal
+install_tex
 
 ############################################################################
 # non-Git delegated configuration

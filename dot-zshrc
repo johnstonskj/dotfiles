@@ -163,6 +163,9 @@ fi
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
+#>>>>>>>>>> Rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
 #>>>>>>>>>> Racket
 export RACKETVERSION=7.1
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then

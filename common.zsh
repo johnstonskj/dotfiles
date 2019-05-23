@@ -326,6 +326,20 @@ xo	    log-debug "+++ installing Docker desktop (from disk image)"
     fi
 }
 
+install_rust() {
+    if [[ $ACTION = (install|update) ]] ; then
+	install_package_for linux rustc rust-doc rust-gdb rust-lldb
+	install_package_for macos rust rustup-init rust-completion
+    fi
+    if [[ $ACTION = install ]] ; then
+	log-debug "+++ installing crates"
+	while IFS= read -r line; do
+	log-debug "+++ +++ crate $line"
+	    run_command cargo install $line
+	done < "$DOTFILEDIR/crates"
+    fi
+}
+
 install_emacs() {
     if [[ $ACTION = (install|update) ]] ; then
 	install_package_for linux emacs-nox elpa-racket-mode

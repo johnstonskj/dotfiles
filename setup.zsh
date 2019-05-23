@@ -47,19 +47,18 @@ install_git
 
 log-info "Programming languages (linux)..."
 install_package_for linux gcc make racket anaconda
-install_package_for linux rustc rust-doc rust-gdb rust-lldb
 install_package_for linux -app vscode
 install_package_for linux -app intellij-idea-community --classic
 
 log-info "Programming languages (macos)..."
 echo_instruction_for macos "xcode-select --install"
 install_package_for macos kotlin minimal-racket
-install_package_for macos rust rustup-init rust-completion
 install_package_for macos -app anaconda
 echo_instruction "ln -s /usr/local/anaconda3 $HOME/anaconda3"
 install_package_for macos -app visual-studio-code intellij-idea-ce
 
 log-info "Programming languages (shared)..."
+install_rust
 install_package -racket iracket
 echo_instruction "racket -l iracket/install"
 

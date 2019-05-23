@@ -1,0 +1,5 @@
+cargo-deps
+cargo-info
+cargo-modules
+cargo-outdated
+cargo-testify

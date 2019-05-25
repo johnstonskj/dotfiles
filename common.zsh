@@ -9,11 +9,18 @@ OSARCH=`uname -m`
 INSTALLER=
 APP_INSTALLER=
 UPDATER=
+DOWNLOADS=~/Downloads
+
+check_not_sudo() {
+    if [[ $UID == 0 || $EUID == 0 ]]; then
+        log-critical "Cannot run as root, run with -h for options"
+    fi
+}
 
 decode_os_type() {
-    case "$OSSYS" in
+    case $OSSYS in
 	darwin)
-	    STDOUT=`defaults read loginwindow SystemVersionStampAsString`
+ 	    STDOUT=$(defaults read loginwindow SystemVersionStampAsString)
 	    if [[ $? -eq 0 ]] ; then
 		OSSYS=macos
 		OSVERSION=$STDOUT
@@ -59,6 +66,10 @@ decode_os_type() {
 	    fi
 	fi
     fi
+
+    if [ ! -d "$DOWNLOADS" ] ; then
+	run_command mkdir $DOWNLOADS
+    fi
 }
 
 ACTION=install
@@ -76,6 +87,8 @@ parse_action() {
              echo "\t-l\tlink files only";
              echo "\t-u\tupgrade only actions";
              echo "\t-v\tverbose mode";
+             echo "\t-V\tvery verbose mode";
+	     echo "\nDo not run this command in sudo mode, it will ask for passwords when it needs them"
 	     exit 0;;
 	-i)  ACTION=install;;
 	-u)  ACTION=update;;
@@ -90,6 +103,8 @@ parse_action() {
     esac
     log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
     log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
+    log-info "Downloading temp files to $DOWNLOADS"
+    run_command mkdir -p $DOWNLOADS
 }
 
 ############################################################################
@@ -138,7 +153,9 @@ install_package_manager() {
 	log-debug "+++ installing homebrew package manager"
 	if [[ $OSSYS = darwin ]] ; then
 	    if [ ! -d "/usr/local/Homebrew" ]; then
-		run_command /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+ 		run_command curl -fsSL -o $DOWNLOADS/brew-install.rb https://raw.githubusercontent.com/Homebrew/install/master/install
+ 		run_command /usr/bin/ruby $DOWNLOADS/brew-install.rb 
+		log-debug "!!! leaving $DOWNLOADS/brew-install.rb"
 		run_command brew tap 'homebrew/services'
 		run_command brew services
 	    fi
@@ -204,6 +221,11 @@ link_dot_file() {
     fi
 }
 
+install_xcode() {
+    xcode-select --install
+    sudo xcode-select --switch /Applications/Xcode.app
+}
+
 install_gpg() {
     if [[ $ACTION = (install|upgrade) ]] ; then
 	install_package gpg
@@ -224,7 +246,7 @@ install_zsh() {
     if [[ $ACTION = install ]] ; then
 	log-debug "+++ integrating shell"
 	local _shellloc=`which zsh`
-	if [[ $(grep -q $_shelloc /etc/shells) -ne 0 ]] ; then
+	if [[ $(grep -q $_shellloc /etc/shells) -ne 0 ]] ; then
 	    run_command sudo cat /etc/shells | sed -e "\$a$_shellloc" >/etc/shells
 	fi
 	run_command chsh -s $_shellloc
@@ -239,7 +261,9 @@ install_zsh() {
     
     if [[ $ACTION = install ]] ; then
 	log-debug "+++ installing oh-my-zsh"
-	run_command sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+	run_command curl -fsSL -o $DOWNLOADS/oh-my-zsh-install.sh https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+	run_command sh $DOWNLOADS/oh-my-zsh-install.sh
+	log-debug "!!! leaving $DOWNLOADS/oh-my-zsh-install.sh"
 	export ZSH=~/.oh-my-zsh
 	
 	log-debug "+++ adding oh-my-zsh plugins"
@@ -280,21 +304,21 @@ install_proton_vpn() {
 	    _country = $1
 	fi
 	log-debug "+++ retrieving Proton config for country=$_country"
-	run_command curl -o ~/Downloads/protonvpn-$_country.ovpn "https://account.protonvpn.com/api/vpn/config?APIVersion=3&Country=$_country&Platform=Linux&Protocol=udp"
+	run_command curl -o $DOWNLOADS/protonvpn-$_country.ovpn "https://account.protonvpn.com/api/vpn/config?APIVersion=3&Country=$_country&Platform=Linux&Protocol=udp"
 	# from https://protonvpn.com/support/linux-vpn-tool/
-	run_command curl -o ~/Downloads/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
-	run_command sudo zsh ~/Downloads/protonvpn-cli.sh --install
-	log-debug "!!! leaving ~/Downloads/protonvpn-$_country.ovpn and ~/Downloads/protonvpn-cli.sh"
+	run_command curl -o $DOWNLOADS/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
+	run_command sudo zsh $DOWNLOADS/protonvpn-cli.sh --install
+ 	log-debug "!!! leaving $DOWNLOADS/protonvpn-$_country.ovpn and $DOWNLOADS/protonvpn-cli.sh"
     fi
 }
 
 install_docker() {
     if [[ $ACTION = (install|update) ]] ; then
 	if [[ $OSSYS = macos ]] ; then
-xo	    log-debug "+++ installing Docker desktop (from disk image)"
-	    run_command curl -o ~/Downloads/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
-	    run_command open ~/Downloads/Docker.dmg
-	    log-debug "!!! leaving ~/Downloads/Docker.dmg"
+	    log-debug "+++ installing Docker desktop (from disk image)"
+	    run_command curl -o $DOWNLOADS/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
+	    run_command open $DOWNLOADS/Docker.dmg
+	    log-debug "!!! leaving $DOWNLOADS/Docker.dmg"
 	else
 	    log-debug "+++ installing Docker CLI"
 	    install_package apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -327,16 +351,18 @@ xo	    log-debug "+++ installing Docker desktop (from disk image)"
 }
 
 install_rust() {
-    if [[ $ACTION = (install|update) ]] ; then
-	install_package_for linux rustc rust-doc rust-gdb rust-lldb
-	install_package_for macos rust rustup-init rust-completion
-    fi
     if [[ $ACTION = install ]] ; then
+        run_command curl  -sSf -o $DOWNLOADS/sh.rustup.rs https://sh.rustup.rs
+	run_command sh $DOWNLOADS/sh.rustup.rs -y -v --no-modify-path
+	log-debug "!!! leaving $DOWNLOADS/sh.rustup.rs"
 	log-debug "+++ installing crates"
 	while IFS= read -r line; do
 	log-debug "+++ +++ crate $line"
 	    run_command cargo install $line
 	done < "$DOTFILEDIR/crates"
+    fi
+    if [[ $ACTION = (install|update) ]] ; then
+	install_package_for macos rustc-completion
     fi
 }
 
@@ -347,12 +373,10 @@ install_emacs() {
 	install_package_for macos -app font-linux-libertine
     fi
     if [[ $ACTION = (install|update|link) ]] ; then
-	if [ ! -d "$DEVHOME" ] ; then
-	    run_command mkdir -p $HOME/.emacs.d/lib
-	fi
+    	run_command mkdir -p $HOME/.emacs.d/lib
+	link_dot_file init.el $HOME/.emacs.d/init.el
     fi
     if [[ $ACTION = (install|update) ]] ; then
-	link_dot_file init.el $HOME/.emacs.d/init.el
 	run_command curl -o $HOME/.emacs.d/lib/scribble.el "https://www.neilvandyke.org/scribble-emacs/scribble.el"
     fi
 }
@@ -378,21 +402,21 @@ install_nvidia_cuda() {
 	    log-debug "+++ graphics drivers"
 	    local NVVER=`nvidia-smi |grep Version |awk '{ print $6 }'`
 	    if [ $NVVER  != "418.43" ]; then
-		run_command curl -o ~/Downloads/nvidia_linux.run "http://us.download.nvidia.com/XFree86/Linux-x86_64/418.43/NVIDIA-Linux-x86_64-418.43.run"
+		run_command curl -o $DOWNLOADS/nvidia_linux.run "http://us.download.nvidia.com/XFree86/Linux-x86_64/418.43/NVIDIA-Linux-x86_64-418.43.run"
 		run_command sudo sh nvidia_linux.run
 		log-debug "+++ turning off Nouveau X drivers"
 		run_command sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
 		run_command sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
-		log-debug "!!! leaving ~/Downloads/nvidia_linux.run"
+		log-debug "!!! leaving $DOWNLOADS/nvidia_linux.run"
 	    fi
 	    echo_instruction "reboot now for driver update"
 	    
 	    log-debug "+++ CUDA programming support..."
-	    run_command curl -o ~/Downloads/cuda_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
-	    run_command sudo sh ~/Downloads/cuda_linux.run
+	    run_command curl -o $DOWNLOADS/cuda_linux.run "https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.105_418.39_linux.run"
+	    run_command sudo sh $DOWNLOADS/cuda_linux.run
 	    run_command mkdir -p $DEVHOME/cuda
 	    run_command cuda-install-samples-10.1.sh $DEVHOME/development/cuda/
-	    log-debug "!!! leaving ~/Downloads/cuda_linux.run"
+	    log-debug "!!! leaving $DOWNLOADS/cuda_linux.run"
 	fi
     fi
 }

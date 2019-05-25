@@ -179,6 +179,11 @@ if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
      source "${HOME}/.iterm2_shell_integration.zsh"
 fi
 
+#>>>>>>>>>> IDEA Plugins
+export IDEA_PLUGINS=/Applications/IntelliJ\ IDEA\ CE.app/Contents/plugins
+export KOTLIN_HOME=$IDEA_PLUGINS/Kotlin
+export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
+
 ############################################################################
 # Just in case......
 ############################################################################

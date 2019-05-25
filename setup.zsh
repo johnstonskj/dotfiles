@@ -9,6 +9,8 @@ DOTFILEDIR=${0:a:h}
 source $DOTFILEDIR/logging.zsh
 source $DOTFILEDIR/common.zsh
 
+check_not_sudo 
+
 decode_os_type
 
 parse_action $*
@@ -52,7 +54,8 @@ install_package_for linux -app intellij-idea-community --classic
 
 log-info "Programming languages (macos)..."
 echo_instruction_for macos "xcode-select --install"
-install_package_for macos kotlin minimal-racket
+install_package_for macos kotlin
+install_package_for macos -app racket
 install_package_for macos -app anaconda
 echo_instruction "ln -s /usr/local/anaconda3 $HOME/anaconda3"
 install_package_for macos -app visual-studio-code intellij-idea-ce

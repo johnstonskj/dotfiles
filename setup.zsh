@@ -35,7 +35,7 @@ log-info "System tools..."
 install_package glances htop lynx parallel tmux
 link_dot_file dot-tmux.conf $HOME/.tmux.conf
 install_package_for linux ethtool
-install_package_for macos gnu-sed
+install_package_for macos coreutils gnu-sed
 
 install_gpg
 install_zsh

@@ -23,6 +23,8 @@ fi
 # Just in case......
 ############################################################################
 
+export DOTFILEDIR=$(dirname $(greadlink -f ${0}))
 if [ -e "$DOTFILEDIR/work-zshenv" ] ; then
+    echo "Running work configuration (env)"
     source "$DOTFILEDIR/work-zshenv"
 fi

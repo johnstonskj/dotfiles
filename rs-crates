@@ -3,3 +3,4 @@ cargo-info
 cargo-modules
 cargo-outdated
 cargo-testify
+--git https://github.com/killercup/rustfix.git

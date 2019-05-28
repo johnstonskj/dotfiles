@@ -352,14 +352,34 @@ install_docker() {
 
 install_rust() {
     if [[ $ACTION = install ]] ; then
+        log-debug "+++ installing rustup"
         run_command curl  -sSf -o $DOWNLOADS/sh.rustup.rs https://sh.rustup.rs
 	run_command sh $DOWNLOADS/sh.rustup.rs -y -v --no-modify-path
 	log-debug "!!! leaving $DOWNLOADS/sh.rustup.rs"
+
+	# This should be the default, but just in case...
+	run_command rustup toolchain add stable
+
 	log-debug "+++ installing crates"
 	while IFS= read -r line; do
 	log-debug "+++ +++ crate $line"
 	    run_command cargo install $line
-	done < "$DOTFILEDIR/crates"
+	done < "$DOTFILEDIR/rs-crates"
+
+	log-debug "+++ installing components"
+	while IFS= read -r line; do
+	log-debug "+++ +++ component $line"
+	    run_command rustup component add $line
+	done < "$DOTFILEDIR/rs-components"
+	echo_instruction export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+
+	log-debug "+++ installing racer"
+	run_command rustup toolchain add nightly
+	run_command cargo +nightly install racer
+
+    fi
+    if [[ $ACTION = update ]] ; then
+	rustup update
     fi
     if [[ $ACTION = (install|update) ]] ; then
 	install_package_for macos rustc-completion
@@ -369,7 +389,7 @@ install_rust() {
 install_emacs() {
     if [[ $ACTION = (install|update) ]] ; then
 	install_package_for linux emacs-nox elpa-racket-mode
-	install_package_for macos emacs markdown-mode rust-mode
+	install_package_for macos emacs markdown-mode rust-mode cargo-mode
 	install_package_for macos -app font-linux-libertine
     fi
     if [[ $ACTION = (install|update|link) ]] ; then

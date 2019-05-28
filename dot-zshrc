@@ -189,7 +189,6 @@ export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
 # Just in case......
 ############################################################################
 
-export DOTFILEDIR=$(dirname $(greadlink -f ${0}))
 if [ -e "$DOTFILEDIR/work-zshrc" ] ; then
     echo "Running work configuration"
     source "$DOTFILEDIR/work-zshrc"

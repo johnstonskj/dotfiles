@@ -24,12 +24,13 @@ fi
 ############################################################################
 
 export DOTFILEDIR=$(dirname $(/usr/local/bin/greadlink -f ~/.zshenv))
+export WORKDOTFILEDIR=$DOTFILEDIR/work-dotfiles
 
 ############################################################################
 # Just in case......
 ############################################################################
 
-if [ -e "$DOTFILEDIR/work-zshenv" ] ; then
-    echo "Running work configuration (env)"
-    source "$DOTFILEDIR/work-zshenv"
+if [ -e "$WORKDOTFILEDIR/work-zshenv" ] ; then
+    echo "Running work configuration (zshenv)"
+    source "$WORKDOTFILEDIR/work-zshenv"
 fi

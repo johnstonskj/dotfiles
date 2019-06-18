@@ -159,13 +159,16 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     # <<< conda initialize <<<
 fi
 
-# >>>>>>>>>> Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-
-#>>>>>>>>>> Rust
-source $HOME/.cargo/env
-export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+#>>>>>>>>>> Ruby
+export PATH=/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
+export PATH=/usr/local/opt/ruby/bin:$PATH
+export PATH=$PATH:$HOME/.rvm/bin
+#export LDFLAGS="-L/usr/local/opt/ruby/lib $LDFLAGS"
+#export CPPFLAGS="-I/usr/local/opt/ruby/include $CPPFLAGS"
+#export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
+if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
+   source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+fi
 
 #>>>>>>>>>> Racket
 export RACKETVERSION=7.1
@@ -174,6 +177,10 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
    export RACKETUSER=$HOME/Library/Racket/$RACKETVERSION
    export PATH=$PATH:$RACKETHOME/bin:$RACKETUSER/bin
 fi
+
+#>>>>>>>>>> Rust
+source $HOME/.cargo/env
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
 #>>>>>>>>>> iTerm2
 if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
@@ -190,6 +197,5 @@ export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
 ############################################################################
 
 if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
-    echo "Running work configuration (zshrc)"
     source "$WORKDOTFILEDIR/work-zshrc"
 fi

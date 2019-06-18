@@ -217,7 +217,12 @@ install_package() {
 
 link_dot_file() {
     if [[ $ACTION = (install|update|link) ]] ; then
-	run_command ln -s $DOTFILEDIR/$1 $2
+	if [[ -e $1 ]] ; then
+	    run_command ln -s $DOTFILEDIR/$1 $2
+	else
+	    log-warning "dot-file $1 doesn't exist"
+	fi
+	
     fi
 }
 
@@ -255,8 +260,12 @@ install_zsh() {
     
     if [[ $ACTION = (install|update|link) ]] ; then
 	log-debug "+++ linking zsh dot files"
-	link_dot_file dot-zshrc $HOME/.zshrc
+	# See https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
 	link_dot_file dot-zshenv $HOME/.zshenv
+	link_dot_file dot-zprofile $HOME/.zprofile
+	link_dot_file dot-zshrc $HOME/.zshrc
+	link_dot_file dot-zlogin $HOME/.zlogin
+	link_dot_file dot-zlogout $HOME/.zlogout
     fi
     
     if [[ $ACTION = install ]] ; then

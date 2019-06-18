@@ -62,6 +62,10 @@ echo_instruction "ln -s /usr/local/anaconda3 $HOME/anaconda3"
 install_package_for macos -app visual-studio-code intellij-idea-ce
 
 log-info "Programming languages (shared)..."
+install_package ruby
+# run_command curl -sSL https://get.rvm.io | bash -s stable
+run_command gem install ffi -v '1.11.1' --source 'https://rubygems.org/'
+run_command gem install bundle jekyll
 install_rust
 install_package -racket iracket
 echo_instruction "racket -l iracket/install"

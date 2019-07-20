@@ -197,7 +197,7 @@ fi
 # Just in case......
 ############################################################################
 
-if [ -e "$DOTFILEDIR/work-zshrc" ] ; then
-    echo "Running work configuration"
-    source "$DOTFILEDIR/work-zshrc"
+if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
+    echo "Running work configuration (zshrc)"
+    source "$WORKDOTFILEDIR/work-zshrc"
 fi

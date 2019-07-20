@@ -175,6 +175,9 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
    export PATH=$PATH:$RACKETHOME/bin:$RACKETUSER/bin
 fi
 
+#>>>>>>>>>> Ruby (Homebrew)
+export PATH=/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
+
 #>>>>>>>>>> iTerm2
 if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
      source "${HOME}/.iterm2_shell_integration.zsh"
@@ -184,6 +187,11 @@ fi
 export IDEA_PLUGINS=/Applications/IntelliJ\ IDEA\ CE.app/Contents/plugins
 export KOTLIN_HOME=$IDEA_PLUGINS/Kotlin
 export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
+
+#>>>>>>>>>> Travis CI
+if [ -f "~/.tyravis/travis.sh" ]; then
+   source ~/.travis/travis.sh
+fi
 
 ############################################################################
 # Just in case......

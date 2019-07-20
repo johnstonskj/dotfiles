@@ -24,6 +24,7 @@ fi
 ############################################################################
 
 export DOTFILEDIR=$(dirname $(/usr/local/bin/greadlink -f ~/.zshenv))
+export PATH=$DOTFILEDIR/bin:$PATH
 
 ############################################################################
 # Just in case......

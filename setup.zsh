@@ -47,6 +47,7 @@ install_proton_vpn "US"
 log-info "Development Environment..."
 install_emacs
 install_git
+install_package travis
 
 log-info "Programming languages (linux)..."
 install_package_for linux gcc make racket anaconda

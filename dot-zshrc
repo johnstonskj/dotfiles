@@ -199,3 +199,5 @@ export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
 if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
     source "$WORKDOTFILEDIR/work-zshrc"
 fi
+# added by travis gem
+[ -f /Users/simonjo/.travis/travis.sh ] && source /Users/simonjo/.travis/travis.sh

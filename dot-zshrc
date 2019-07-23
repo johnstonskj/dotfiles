@@ -182,6 +182,10 @@ fi
 source $HOME/.cargo/env
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
+#>>>>>>>>>> Ruby (Homebrew)
+export PATH=/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
+>>>>>>> 6f83cb5c9511276463156a3f103d10660af17a3f
+
 #>>>>>>>>>> iTerm2
 if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
      source "${HOME}/.iterm2_shell_integration.zsh"
@@ -192,6 +196,11 @@ export IDEA_PLUGINS=/Applications/IntelliJ\ IDEA\ CE.app/Contents/plugins
 export KOTLIN_HOME=$IDEA_PLUGINS/Kotlin
 export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
 
+#>>>>>>>>>> Travis CI
+if [ -f "~/.tyravis/travis.sh" ]; then
+   source ~/.travis/travis.sh
+fi
+
 ############################################################################
 # Just in case......
 ############################################################################
@@ -199,5 +208,3 @@ export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
 if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
     source "$WORKDOTFILEDIR/work-zshrc"
 fi
-# added by travis gem
-[ -f /Users/simonjo/.travis/travis.sh ] && source /Users/simonjo/.travis/travis.sh

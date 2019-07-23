@@ -20,8 +20,17 @@ else
 fi
 
 ############################################################################
+# Setup the base directory for customized files
+############################################################################
+
+export DOTFILEDIR=$(dirname $(/usr/local/bin/greadlink -f ~/.zshenv))
+export PATH=$DOTFILEDIR/bin:$PATH
+
+############################################################################
 # Just in case......
 ############################################################################
+
+export WORKDOTFILEDIR=$DOTFILEDIR/work-dotfiles
 
 if [ -e "$WORKDOTFILEDIR/work-zshenv" ] ; then
     source "$WORKDOTFILEDIR/work-zshenv"

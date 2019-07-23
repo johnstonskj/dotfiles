@@ -184,7 +184,6 @@ export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
 #>>>>>>>>>> Ruby (Homebrew)
 export PATH=/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
->>>>>>> 6f83cb5c9511276463156a3f103d10660af17a3f
 
 #>>>>>>>>>> iTerm2
 if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then

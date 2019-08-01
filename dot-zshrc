@@ -142,7 +142,22 @@ alias docker-ubuntu='docker run -it ubuntu bash'
 # Package-specific customizations
 ############################################################################
 
+#>>>>>>>>>> LLVM
+# To use the bundled libc++ please add the following LDFLAGS:
+LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+
+# llvm is keg-only, which means it was not symlinked into /usr/local,
+# because macOS already provides this software and installing another version in
+# parallel can cause all kinds of trouble.
+export PATH=$PATH:/usr/local/opt/llvm/bin
+
+# For compilers to find llvm you may need to set:
+export LDFLAGS="-L/usr/local/opt/llvm/lib"
+export CPPFLAGS="-I/usr/local/opt/llvm/include"
+
+#>>>>>>>>>> Python (Anaconda)
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+    export PATH=/usr/local/anaconda3/bin:$PATH
     # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
     __conda_setup="$('/Users/simonjo/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"

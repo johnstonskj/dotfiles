@@ -318,6 +318,10 @@ install_proton_vpn() {
 	run_command curl -o $DOWNLOADS/protonvpn-cli.sh "https://raw.githubusercontent.com/ProtonVPN/protonvpn-cli/master/protonvpn-cli.sh"
 	run_command sudo zsh $DOWNLOADS/protonvpn-cli.sh --install
  	log-debug "!!! leaving $DOWNLOADS/protonvpn-$_country.ovpn and $DOWNLOADS/protonvpn-cli.sh"
+    elif [[ $OSSYS = macos && $ACTION = (install|update) ]] ; then
+	run_command curl -o $DOWNLOADS/protonvpn.dmg "https://protonvpn.com/download/ProtonVPN.dmg"
+	open $DOWNLOADS/protonvpn.dmg
+ 	log-debug "!!! leaving $DOWNLOADS/protonvpn.dmg"
     fi
 }
 

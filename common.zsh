@@ -424,8 +424,6 @@ install_git() {
     if [[ $ACTION = (install|update|link) ]] ; then
 	link_dot_file dot-gitconfig $HOME/.gitconfig
 	link_dot_file dot-gitignore_global $HOME/.gitignore_global
-	mkdir -p $HOME/.git/hooks
-	link_dot_file git-pre-push $HOME/.git/hooks/pre-push
     fi
 }
 

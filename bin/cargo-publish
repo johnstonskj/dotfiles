@@ -5,7 +5,7 @@ if [[ "$1" == "" ]] ; then
     exit 1
 fi
 
-cd $(git rev-parse --show-toplevel)
+pushd $(git rev-parse --show-toplevel)
 
 if ! cargo clean && cargo fmt -- --check && cargo test && cargo doc --no-deps ; then
     echo "Error: failed cargo pre-requisite steps"
@@ -23,6 +23,7 @@ if [[ -e Cargo.toml ]] ; then
         git tag -a "v$VER" -m "$1"
         git push --tags --no-verify
 
+        popd
     else 
         echo "Error: cargo publish command failed"
         exit 3

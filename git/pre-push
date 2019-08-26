@@ -3,5 +3,5 @@
 if [[ -f "$(git rev-parse --show-toplevel)/Cargo.toml" ]] ; then
    echo "Running Rust pre-push checks"
 
-   cargo clean && cargo fmt --verbose -- --check && cargo test --verbose && cargo doc --verbose
+   cargo clean && cargo fmt --verbose -- --check && cargo test --verbose && cargo doc --verbose --no-deps
 fi

@@ -1,22 +1,43 @@
 #!/usr/bin/env bash
 
+info() {
+    echo "Info: $1"
+}
+
+error() {
+    echo "Error: $1" >&2
+}
+
+fatal() {
+    error $1
+    exit $2
+}
+
 if [[ "$1" == "" ]] ; then
-    echo "Error: a version message is required as first paramater"
-    exit 1
+
+    fatal "a version message is required as first paramater" 1
 fi
 
 pushd $(git rev-parse --show-toplevel)
 
 if ! cargo clean && cargo fmt -- --check && cargo test && cargo doc --no-deps ; then
-    echo "Error: failed cargo pre-requisite steps"
-    exit 2
+
+    fatal "failed cargo pre-requisite steps" 2
 fi
 
 if [[ -e Cargo.toml ]] ; then
 
     VER=$(grep "^version = " Cargo.toml | egrep -o "[0-9\.]+(\-[a-zA-Z0-9\-_]+)?")
 
-    echo "Info: about to publish version $VER"
+    info "about to publish version $VER"
+
+    if [[ -e README.md ]] ; then
+
+        if ! grep -q "\*\*$VER\*\*" README.md; then
+
+            fatal "version not listed in README.md" 3
+        fi
+    fi
 
     if cargo publish; then
 
@@ -25,10 +46,10 @@ if [[ -e Cargo.toml ]] ; then
 
         popd
     else 
-        echo "Error: cargo publish command failed"
-        exit 3
+
+        fatal "cargo publish command failed" 4
     fi
 else
-    echo "Error: no cargo file; are you in the right place?"
-    exit 4
+
+    fatal "no cargo file; are you in the right place?" 5
 fi

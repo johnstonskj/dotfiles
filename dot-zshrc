@@ -133,6 +133,7 @@ alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:ME
 alias hangouts='hangups --col-scheme=solarized-dark'
 alias tmls='tmux ls'
 alias tma='tmux a'
+alias vi='vim'
 
 # Docker image commands
 alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'

@@ -285,6 +285,11 @@ install_zsh() {
 	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font
 	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font-mono
 	install_package_for linux fonts-powerline
+# git clone https://github.com/powerline/fonts.git --depth=1
+# cd fonts
+# ./install.sh
+# cd ..
+# rm -rf fonts
     fi
 }
 
@@ -417,7 +422,6 @@ install_emacs() {
 install_git() {
     if [[ $ACTION = (install|update) ]] ; then
 	install_package git git-lfs
-	install_package -app gitkraken
 	install_package_for linux git-hub
 	# maybe one day - https://github.com/sickill/git-dude
     fi

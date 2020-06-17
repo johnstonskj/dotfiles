@@ -28,6 +28,9 @@ create_development_dir
 log-info "Installing/Upating package manager..."
 install_package_manager
 
+log-info "Adding fonts..."
+install_fonts
+
 ############################################################################
 # Installation and configuration actions
 ############################################################################
@@ -39,6 +42,7 @@ install_package_for linux ethtool
 install_package_for macos coreutils gnu-sed
 
 install_gpg
+install_alacritty
 install_zsh
 install_openssh
 install_docker
@@ -48,6 +52,8 @@ log-info "Development Environment..."
 install_emacs
 install_git
 install_package travis
+
+run_command cargo install fselect
 
 log-info "Programming languages (linux)..."
 install_package_for linux gcc make racket anaconda

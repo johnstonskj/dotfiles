@@ -241,6 +241,17 @@ install_gpg() {
     fi
 }
 
+install_fonts() {
+    if [[ $ACTION = (install|update) ]] ; then
+	log-debug "+++ installing fonts"
+	install_package_for macos -app font-firacode
+	install_package_for macos -app font-firacode-nerd-font
+	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font
+	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font-mono
+	install_package_for linux fonts-powerline
+    fi
+}
+
 install_zsh() {
     if [[ $ACTION = (install|update) ]] ; then
 	log-debug "+++ installing zsh"
@@ -278,13 +289,6 @@ install_zsh() {
 	log-debug "+++ adding oh-my-zsh plugins"
 	run_command git clone https://github.com/bhilburn/powerlevel9k.git $ZSH/custom/themes/powerlevel9k
 	run_command git clone https://github.com/zsh-users/zsh-docker.git $ZSH/custom/plugins/zsh-docker
-    fi
-
-    if [[ $ACTION = (install|update) ]] ; then
-	log-debug "+++ adding powerline fonts"
-	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font
-	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font-mono
-	install_package_for linux fonts-powerline
     fi
 
     if [[ $ACTION = (install|update) ]] ; then

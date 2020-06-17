@@ -1,5 +1,5 @@
 [aws]
-symbol = " "
+symbol = "  "
 
 [battery]
 full_symbol = ""
@@ -74,3 +74,18 @@ symbol = " "
 
 [rust]
 symbol = " "
+
+[custom.os-macos]
+description = "MacOS Version"
+symbol = " "
+command = "/usr/bin/sw_vers -productVersion"
+when = """ test `uname -s` == "Darwin" """
+
+[custom.os-linux]
+symbol = " "
+when = """  """
+
+[custom.os-windows]
+symbol = " "
+when = """  """
+

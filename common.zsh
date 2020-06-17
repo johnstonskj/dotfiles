@@ -286,6 +286,15 @@ install_zsh() {
 	install_package_for macos -app homebrew/cask-fonts/font-meslo-nerd-font-mono
 	install_package_for linux fonts-powerline
     fi
+
+    if [[ $ACTION = (install|update) ]] ; then
+	log-debug "+++ adding Starship prompt"
+	install_package starship
+    fi
+
+    if [[ $ACTION = (install|update|link) ]] ; then
+	link_dot_file starship.toml $HOME/.config/starship.toml
+    fi
 }
 
 install_openssh() {
@@ -360,6 +369,29 @@ install_docker() {
     fi
     if [[ $ACTION = install ]] ; then
 	echo_instruction "docker run hello-world"
+    fi
+}
+
+install_alacrity() {
+    if [[ $ACTION = install ]] ; then
+        log-debug "+++ installing alacrity"
+	if [[ $OSSYS = macos ]] ; then
+	    install_package_for macos -app alacrity
+	else
+	    run_command add-apt-repository ppa:mmstick76/alacritty
+	    install_package_for linux alacrity
+	fi
+	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.man > $DOWNLOADS/alacrity.man
+	run_command sudo mkdir -p /usr/local/share/man/man1
+	run_command gzip -c $DOWNLOADS/alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
+	run_command log-debug "!!! leaving $DOWNLOADS/alacritty.man"
+
+	run_command mkdir -p ~/.zsh_functions
+	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/completions/_alacritty > ~/.zsh_functions/_alacrity
+
+	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.info > $DOWNLOADS/alacritty.info
+	run_command sudo tic -xe alacritty,alacritty-direct $DOWNLOADS/alacritty.info
+	run_command log-debug "!!! leaving $DOWNLOADS/alacritty.ino"
     fi
 }
 
@@ -457,5 +489,15 @@ install_nvidia_cuda() {
 install_tex() {
     if [[ $ACTION = (install|update) ]] ; then
 	install_package_for macos -app mactex texpad
+    fi
+}
+
+install_wtf() {
+    if [[ $ACTION = (install|update) ]] ; then
+	if [[ $OSSYS = macos ]] ; then
+            run_command brew tap wtfutil/wtfutil
+        fi
+        install_package_for macos wfutil
+	link_dot_file wtf-config.yml $HOME/.config/wtf/config.yml
     fi
 }

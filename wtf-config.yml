@@ -1,0 +1,231 @@
+wtf:
+  colors:
+    background: black
+    border:
+      focusable: darkslateblue
+      focused: orange
+      normal: gray
+    checked: yellow
+    highlight: 
+      fore: black
+      back: gray
+    rows:
+      even: yellow
+      odd: white
+  grid:
+    # How _wide_ the columns are, in terminal characters. 
+    columns: [45, 35, 35, 35, 35]
+    # How _high_ the rows are, in terminal lines.
+    rows: [15, 10, 10, 10, 10, 3]
+  refreshInterval: 1
+  openFileUtil: "open"
+
+  mods:
+
+    spotify:
+      enabled: true
+      position:
+        top: 0
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 0
+  
+    weather:
+      apiKey: "b9e1d868d3350a880bd0c26d3a60a7dc"
+      # From http://openweathermap.org/help/city_list.txt
+      cityids:
+      - 5809844
+      - 4280502
+      - 1642911
+      - 3526756
+      - 3333183
+      - 6359304
+      colors:
+        current: "lightblue"
+      enabled: true
+      language: "EN"
+      position:
+        top: 1
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 900
+      tempUnit: "F"
+      
+    clocks:
+      colors:
+        rows:
+          even: "lightblue"
+          odd: "white"
+      enabled: true
+      locations:
+        # From https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        Portsmouth: "Europe/London"
+        Madrid: "Europe/Madrid"
+        New York: "America/New York"
+        Seattle: "America/Los_Angeles"
+        UTC: "Etc/UTC"
+      refreshInterval: 15
+      # Valid options are: alphabetical, chronological
+      sort: "chronological"
+      position:
+        top: 2
+        left: 0
+        height: 1
+        width: 1
+
+    todolist:
+      type: todo
+      checkedIcon: "X"
+      colors:
+        checked: gray
+        highlight:
+          fore: "black"
+          back: "orange"
+      enabled: true
+      filename: "todo.yml"
+      position:
+        top: 3
+        left: 0
+        height: 1
+        width: 1
+      refreshInterval: 3600
+      
+    gcal:
+      colors:
+        title: "white"
+        description: "lightblue"
+        highlights:
+        - ['1on1|1\/11', 'green']
+        - ['apple|google|aws', 'blue']
+        - ['interview|meet', 'magenta']
+        - ['lunch', 'yellow']
+        past: "gray"
+      conflictIcon: "🚨"
+      currentIcon: "💥"
+      displayResponseStatus: true
+      email: "johnstonskj@gmail.com"
+      enabled: true
+      eventCount: 12
+      multiCalendar: true
+      position:
+        top: 4
+        left: 0
+        height: 2
+        width: 1
+      refreshInterval: 300
+      secretFile: "~/.config/wtf/gcal/client_secret.json"
+      showDeclined: true
+      timezone: "America/Vancouver"
+      withLocation: true
+
+    git:
+      commitCount: 5
+      commitFormat: "[forestgreen]%h [grey]%cd [white]%s [grey]%an[white]"
+      dateFormat: "%H:%M %d %b %y"
+      enabled: true
+      position:
+        top: 0
+        left: 1
+        height: 1
+        width: 4
+      refreshInterval: 8
+      repositories:
+      - "/Users/simonjo/Projects/SimonjoDocuments"
+      - "/Users/simonjo/Projects/FreshDocumentationTemplates"
+  
+    travisci:
+      apiKey: "29TPz4T5KyTJplA-tMbsLw"
+      enabled: true
+      position:
+        top: 1
+        left: 1
+        height: 1
+        width: 4
+      pro: false
+      refreshInterval: 900
+      
+    news:
+      type: hackernews
+      title: "HackerNews"
+      enabled: true
+      numberOfStories: 30
+      position:
+        top: 2
+        left: 1
+        height: 1
+        width: 4
+      storyType: top
+      refreshInterval: 900
+      
+    battery:
+      type: power
+      title: "⚡️"
+      enabled: true
+      position:
+        top: 3
+        left: 1
+        height: 1
+        width: 1
+      refreshInterval: 15
+      
+    security_info:
+      type: security
+      title: "Staying safe"
+      enabled: true
+      position:
+        top: 3
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 3600
+      
+    ip:
+      type: ipinfo
+      title: "My IP"
+      colors:
+        name: "lightblue"
+        value: "white"
+      enabled: true
+      position:
+        top: 3
+        left: 3
+        height: 1
+        width: 2
+      refreshInterval: 150
+            
+    resources:
+      type: resourceusage
+      enabled: true
+      position:
+        top: 4
+        left: 1
+        height: 2
+        width: 1
+      refreshInterval: 1
+      
+    disks:
+      type: cmdrunner
+      cmd: "df"
+      args: ["-h"]
+      enabled: true
+      position:
+        top: 4
+        left: 2
+        height: 1
+        width: 3
+      refreshInterval: 3600
+
+    uptime:
+      type: cmdrunner
+      args: [""]
+      cmd: "uptime"
+      enabled: true
+      position:
+        top: 5
+        left: 2
+        height: 1
+        width: 3
+      refreshInterval: 30
+      

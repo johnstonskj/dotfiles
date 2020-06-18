@@ -1,2 +1,2 @@
 #/usr/bin/env zsh
-git push --delete origin $1 && git tag -d $1 && git tag -a $1
+git push --delete origin $1 && git tag -d $1 && git tag -a $1 -m $2

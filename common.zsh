@@ -453,7 +453,6 @@ install_emacs() {
 install_git() {
     if [[ $ACTION = (install|update) ]] ; then
 	install_package git git-lfs
-	install_package -app gitkraken
 	install_package_for linux git-hub
 	# maybe one day - https://github.com/sickill/git-dude
     fi

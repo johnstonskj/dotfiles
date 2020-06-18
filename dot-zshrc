@@ -124,6 +124,7 @@ alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
 alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
 alias tmls='tmux ls'
 alias tma='tmux a'
+alias vi='vim'
 
 alias weather='curl wttr.in'
 alias wtf='wtfutil'
@@ -155,14 +156,14 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     export PATH=/usr/local/anaconda3/bin:$PATH
     # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
-    __conda_setup="$('/Users/simonjo/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    __conda_setup="$('/Users/$(whoami)/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
     if [ $? -eq 0 ]; then
 	eval "$__conda_setup"
     else
-	if [ -f "/Users/simonjo/anaconda/etc/profile.d/conda.sh" ]; then
-            . "/Users/simonjo/anaconda/etc/profile.d/conda.sh"
+	if [ -f "/Users/$(whoami)/anaconda/etc/profile.d/conda.sh" ]; then
+            . "/Users/$(whoami)/anaconda/etc/profile.d/conda.sh"
 	else
-            export PATH="/Users/simonjo/anaconda/bin:$PATH"
+            export PATH="/Users/$(whoami)/anaconda/bin:$PATH"
 	fi
     fi
     unset __conda_setup

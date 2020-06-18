@@ -49,6 +49,8 @@ install_docker
 install_proton_vpn "US"
 
 log-info "Development Environment..."
+install_package_for linux vim
+link_dot_file dot-vimrc $HOME/.vimrc
 install_emacs
 install_git
 install_package travis

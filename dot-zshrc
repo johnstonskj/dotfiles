@@ -105,15 +105,29 @@ else
    SED=sed
 fi
 
-alias ll='ls -alF'
-alias weather='curl wttr.in'
+alias ls='exa'
+alias l='exa -lT -all --git --group-directories-first'
+alias ll='exa -l --all --git --group-directories-first'
+alias lt='exa -T --git --git-ignore --level=2 --group-directories-first'
+alias llt='exa -lT --git --git-ignore --level=2 --group-directories-first'
+alias cat=bat
+alias du=dust
+alias find=fd
+alias fzf=sk
+alias grep='rg --color=always --line-number'
 alias hd='od -tcx1'
+alias more=less
+alias sed=sd
+alias top=htop
+
 alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
 alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
-alias hangouts='hangups --col-scheme=solarized-dark'
 alias tmls='tmux ls'
 alias tma='tmux a'
+
+alias weather='curl wttr.in'
 alias wtf='wtfutil'
+alias myip='curl http://ipecho.net/plain; echo'
 
 # Docker image commands
 alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'

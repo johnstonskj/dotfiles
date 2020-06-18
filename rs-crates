@@ -16,7 +16,9 @@ cargo-watch
 --git https://github.com/killercup/rustfix.git
 bottom
 du-dust
+fselect
 mdbook
 nu --all-features
 sd
 skim
+xsv

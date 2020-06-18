@@ -1,6 +1,22 @@
+cargo-audit
+cargo-cache
+cargo-count
 cargo-deps
+cargo-edit
+cargo-generate
 cargo-info
+cargo-make
 cargo-modules
 cargo-outdated
+cargo-release
+cargo-generate
 cargo-testify
+cargo-udeps
+cargo-watch
 --git https://github.com/killercup/rustfix.git
+bottom
+du-dust
+mdbook
+nu --all-features
+sd
+skim

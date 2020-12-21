@@ -115,12 +115,9 @@ parse_action() {
 	-V)  shift;
 	     LOGLEVEL=4;
 	     parse_action $*;;
-	*)   ACTION=install;;
+	*)  
+		 ACTION=install;;
     esac
-    log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
-    log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
-    log-info "Downloading temp files to $DOWNLOADS"
-    run_command mkdir -p $DOWNLOADS
 }
 
 ############################################################################
@@ -141,6 +138,15 @@ show_actions() {
 }
 
 run_actions () {
+    log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
+    log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
+    log-info "Downloading temp files to $DOWNLOADS"
+	make_dir $DOWNLOADS
+    log-info "Using binary file dir $LOCAL_BIN"
+    make_dir $LOCAL_BIN
+    log-info "Using configuration dir $LOCAL_CONFIG"
+    make_dir $LOCAL_CONFIG
+
 	if [[ -f "$ACTIONDIR/$ACTION_ARGS/$ACTION_FILE" ]] ; then
 		run_item_actions "$ACTIONDIR/$ACTION_ARGS"
 	else
@@ -223,6 +229,16 @@ install_package() {
 		    *)
 			run_command $INSTALLER $_action $@ ;;
 		esac
+    fi
+}
+
+make_dir() {
+    if [[ -e $1 ]] ; then
+    	if [[ ! -d $1 ]] ; then
+    		log-error "$1 exists, but is not a directory."
+    	fi
+    else
+    	run_command mkdir -p $1
     fi
 }
 

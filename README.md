@@ -19,6 +19,7 @@ DESCRIPTION
 	-i	run all install actions
 	-l	link files only
 	-u	upgrade only actions
+	-s  show available actions
 	-v	verbose mode
 ```
 
@@ -30,11 +31,4 @@ symlinks).
 ## Setup files
 
 * `setup.zsh` - setup environment for MacOS, Ubuntu, (and some Red Hat) development.
-* `common.zsh` - common setup/install functions.
-* `logging.zsh` - shell friendly logging functions.
-
-## Configuration
-
-* `dot-gitconfig` and `dot-gitignore_global` - configuration for Git.
-* `dot-tmux.conf` - configuration for tmux.
-* `dot-zshrc` and `dot-zshenv` - configuration for zsh (set as default shell in setup).
+* `actions/` - folder for groups and individual install structures.

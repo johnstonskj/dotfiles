@@ -1,12 +1,10 @@
 cargo-audit
 cargo-cache
-cargo-count
 cargo-deps
 cargo-edit
 cargo-generate
 cargo-info
 cargo-make
-cargo-modules
 cargo-outdated
 cargo-release
 cargo-generate

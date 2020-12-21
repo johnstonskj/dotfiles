@@ -1,0 +1,2 @@
+install_package_for macos llvm
+link_env_file llvm

@@ -1,0 +1,127 @@
+############################################################################
+# Top-level stuff
+############################################################################
+
+COMPLETION_WAITING_DOTS="true"
+
+############################################################################
+# Plugin and other customization
+############################################################################
+
+# Which plugins would you like to load?
+plugins=(git github gnu-utils python pip tmux)
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+    plugins+=(osx)
+	  brew_prefix=$(brew --prefix)
+
+	  if type brew &>/dev/null; then
+  	    FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
+	   
+	      FPATH=$brew_prefix/share/zsh-completions:$FPATH
+	   
+	      FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
+	      source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
+    fi
+fi
+
+############################################################################
+# Prompt/Path/Environment customizations
+############################################################################
+
+if [ -d "$HOME/bin" ] ; then
+    PATH=$HOME/bin:$PATH
+fi
+
+if [ -d "/usr/local" ] ; then
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/sbin:$PATH
+    export MANPATH=/usr/local/man:$MANPATH
+fi
+
+export ARCHFLAGS="-arch x86_64"
+
+export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+############################################################################
+# Aliases
+############################################################################
+
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+   SED=gsed
+else
+   SED=sed
+fi
+
+alias ls='exa'
+alias l='exa -lT -all --git --group-directories-first'
+alias ll='exa -l --all --git --group-directories-first'
+alias lt='exa -T --git --git-ignore --level=2 --group-directories-first'
+alias llt='exa -lT --git --git-ignore --level=2 --group-directories-first'
+alias cat=bat
+alias du=dust
+alias find=fd
+alias fzf=sk
+alias grep='rg --color=always --line-number'
+alias hd='od -tcx1'
+alias more=less
+alias sed=sd
+alias top=htop
+
+alias dtree="find . -print | sed 's;[^/]*/;|___;g;s;___|; |;g'"
+alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
+alias tmls='tmux ls'
+alias tma='tmux a'
+alias vi='vim'
+
+alias weather='curl wttr.in'
+alias wtf='wtfutil'
+alias myip='curl http://ipecho.net/plain; echo'
+
+# Docker image commands
+alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'
+alias docker-ubuntu='docker run -it ubuntu bash'
+
+############################################################################
+# Package-specific customizations
+############################################################################
+
+export LOCAL_CONFIG=$HOME/.config
+
+#>>>>>>>>>> LLVM
+source $LOCAL_CONFIG/llvm/env
+
+#>>>>>>>>>> Python (Anaconda)
+source $LOCAL_CONFIG/python/env
+
+#>>>>>>>>>> Ruby
+source $LOCAL_CONFIG/ruby/env
+
+#>>>>>>>>>> Ruby (Homebrew)
+export PATH=/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
+
+#>>>>>>>>>> Rust
+source $HOME/.cargo/env
+
+#>>>>>>>>>> iTerm2
+if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
+     source "${HOME}/.iterm2_shell_integration.zsh"
+fi
+
+#>>>>>>>>>> IDEA Plugins
+export IDEA_PLUGINS=/Applications/IntelliJ\ IDEA\ CE.app/Contents/plugins
+export KOTLIN_HOME=$IDEA_PLUGINS/Kotlin
+export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
+
+#>>>>>>>>>> Travis CI
+if [ -f "~/.tyravis/travis.sh" ]; then
+   source ~/.travis/travis.sh
+fi
+
+############################################################################
+# Just in case......
+############################################################################
+
+if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
+    source "$WORKDOTFILEDIR/work-zshrc"
+fi
+
+eval "$(starship init zsh)"

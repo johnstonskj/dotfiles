@@ -1,0 +1,2 @@
+install_package_for macos sublime-text
+install_package_for macos sublime-merge

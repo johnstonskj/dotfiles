@@ -12,6 +12,7 @@ cargo-testify
 cargo-udeps
 cargo-watch
 --git https://github.com/killercup/rustfix.git
+bat
 bottom
 du-dust
 eva

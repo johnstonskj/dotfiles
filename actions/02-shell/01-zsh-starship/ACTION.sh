@@ -4,5 +4,5 @@ if [[ $ACTION = (install|update) ]] ; then
 fi
 
 if [[ $ACTION = (install|update|link) ]] ; then
-	link_file starship.toml $HOME/.config/starship.toml
+	link_file starship.toml $LOCAL_CONFIG/starship.toml
 fi

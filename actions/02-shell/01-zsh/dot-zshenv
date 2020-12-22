@@ -19,6 +19,8 @@ else
     export EDITOR='emacs'
 fi
 
+export EMACS_CONF=$HOME/.emacs.d
+
 ############################################################################
 # Setup the base directory for customized files
 ############################################################################

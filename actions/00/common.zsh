@@ -238,12 +238,14 @@ make_dir() {
     		log-error "$1 exists, but is not a directory."
     	fi
     else
+    	log-debug "Making new directory $1"
     	run_command mkdir -p $1
     fi
 }
 
 remove_file() {
 	if [[ -e "$1" ]] ; then
+		log-debug "Removing file $1"
 		run_command rm "$1"
 	else
 		log-warning "File $1 does not exist."

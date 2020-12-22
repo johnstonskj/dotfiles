@@ -5,8 +5,8 @@ if [[ $ACTION = (install|update) ]] ; then
 fi
 
 if [[ $ACTION = (install|update|link) ]] ; then
-	link_file $CURR_ACTION/dot-gitconfig $HOME/.gitconfig
-	link_file $CURR_ACTION/dot-gitignore_global $HOME/.gitignore_global
-	link_file $CURR_ACTION/git-tag-delete $LOCAL_BIN/git-tag-delete
-	link_file $CURR_ACTION/git-tag-replace $LOCAL_BIN/git-tag-replace
+	link_file dot-gitconfig $HOME/.gitconfig
+	link_file dot-gitignore_global $HOME/.gitignore_global
+	link_file git-tag-delete $LOCAL_BIN/git-tag-delete
+	link_file git-tag-replace $LOCAL_BIN/git-tag-replace
 fi

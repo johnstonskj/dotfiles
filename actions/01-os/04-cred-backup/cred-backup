@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+zip -r credential-backup.zip \
+        .github-token \
+        .gnupg \
+        .midway \
+        .ssh \
+        .travis
+gpg -se -r "Simon Johnston" -o credential-backup credential-backup.zip
+rm credential-backup.zip

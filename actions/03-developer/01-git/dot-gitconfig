@@ -1,7 +1,7 @@
 [user]
 	name = Simon Johnston
 	email = johnstonskj@gmail.com
-	signingkey = 565B73DB6CC7F708
+	signingkey = 49CC458D0281805F54A1B65A565B73DB6CC7F708
 [color]
 	ui = auto
 [core]
@@ -18,3 +18,11 @@
 	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
+[gpg]
+        program = /usr/local/bin/gpg
+[commit]
+        gpgSign = true
+[mergetool]
+        keepBackup = true
+[tag]
+        forceSignAnnotated = false

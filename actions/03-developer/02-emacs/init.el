@@ -16,15 +16,55 @@
 
 (set-language-environment "UTF-8")
 
+;; --------------------------------------------------------------------------
+;;; set up package syncing to allow for syncing between different machines
+
+;; list of packages to sync
+(setq pfl-packages
+        '(
+        	; config
+            color-theme-sanityinc-solarized
+            rainbow-delimiters
+            smart-tabs-mode
+			; company
+            company
+            company-quickhelp
+			; modes
+            markdown-mode
+            markdown-mode+
+            racket-mode
+            emacs-racer
+            rust-mode
+            cargo-mode
+            toml-mode
+            yaml-mode
+            json-mode
+            ))
+
+;; refresh package list if it is not already available
+(when (not package-archive-contents) (package-refresh-contents))
+
+;; install packages from the list that are not yet installed
+(dolist (pkg pfl-packages)
+    (when (and (not (package-installed-p pkg)) (assoc pkg package-archive-contents))
+        (package-install pkg)))
+
+;; --------------------------------------------------------------------------
+;; Company customization
+
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;; --------------------------------------------------------------------------
 ;; Markdown customization
 
-(autoload 'gfm-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
+\(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-(setq auto-mode-alist (cons '("\\.markdown$" . gfm-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.md$" . gfm-mode) auto-mode-alist))
-
+(autoload 'gfm-mode "markdown-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
 ;; --------------------------------------------------------------------------
 ;; Rust customization

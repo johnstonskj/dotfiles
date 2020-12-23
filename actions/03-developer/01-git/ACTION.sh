@@ -1,7 +1,7 @@
 if [[ $ACTION = (install|update) ]] ; then
 	install_package git git-lfs
 	install_package_for linux git-hub
-	# maybe one day - https://github.com/sickill/git-dude
+	install_package_for macos -app gitkraken
 fi
 
 if [[ $ACTION = (install|update|link) ]] ; then

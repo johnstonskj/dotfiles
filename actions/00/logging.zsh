@@ -9,7 +9,7 @@ LOGLEVEL=1
 __log() {
     local level=$1$2$reset_color
     printf "%s %8d %8s [%s] - "  `date "+%Y:%m:%dT%H:%M:%S%Z"` $$ `logname` $level
-    echo $fg_bold[white]$3$reset_color
+    echo $fg_bold[default]$3$reset_color
 }
 
 log() {
@@ -29,7 +29,7 @@ log() {
 		__log $fg[green] "INFO" $2
 		;;
 	    *)
-		__log $fg[white] "DEBUG" $2
+		__log $reset_color "DEBUG" $2
 		;;
 	esac
     fi
@@ -42,7 +42,7 @@ log-info() { log 3 $@ }
 log-debug() { log 4 $@ }
 
 echo_bright() {
-    echo $fg_bold[white]$1$reset_color
+    echo $fg_bold[default]$1$reset_color
 }
 
 echo_instruction() {
@@ -50,9 +50,9 @@ echo_instruction() {
 }
 
 echo_instruction_for() {
-    if [[ $OSTYPE = $1* && $ACTION = (install) ]] ; then
-	shift
-	echo_instruction $@
+    if [[ $OSTYPE = $1* ]] ; then
+		shift
+		echo_instruction $@
     fi
 }
 

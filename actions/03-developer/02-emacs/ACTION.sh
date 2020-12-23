@@ -2,7 +2,7 @@ EMACS_CONF=$HOME/.emacs.d
 
 if [[ $ACTION = (install|update) ]] ; then
 	install_package_for linux emacs-nox elpa-racket-mode
-	install_package_for macos emacs markdown-mode rust-mode cargo-mode
+	install_package_for macos emacs
 	install_package_for macos -app font-linux-libertine
 fi
 

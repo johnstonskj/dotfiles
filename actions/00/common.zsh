@@ -116,7 +116,7 @@ parse_action() {
 	     LOGLEVEL=4;
 	     parse_action $*;;
 	*)  
-		 ACTION=install;;
+		 ACTION=install; ACTION_ARGS=$@;;
     esac
 }
 

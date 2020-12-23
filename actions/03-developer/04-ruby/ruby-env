@@ -1,10 +1,14 @@
 export RUBYVERSION=2.6.3
 export PATH=/usr/local/lib/ruby/gems/$RUBYVERSION/bin:$PATH
 export PATH=/usr/local/opt/ruby/bin:$PATH
-export PATH=$PATH:$HOME/.rvm/bin
+
 #export LDFLAGS="-L/usr/local/opt/ruby/lib $LDFLAGS"
 #export CPPFLAGS="-I/usr/local/opt/ruby/include $CPPFLAGS"
 #export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
 if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
    source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 fi

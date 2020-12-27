@@ -6,15 +6,15 @@ if [[ $ACTION = install ]] ; then
 	    run_command add-apt-repository ppa:mmstick76/alacritty
 	    install_package_for linux alacrity
 	fi
-	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.man > $DOWNLOADS/alacrity.man
+	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.man > $LOCAL_DOWNLOADS/alacrity.man
 	run_command sudo mkdir -p /usr/local/share/man/man1
-	run_command gzip -c $DOWNLOADS/alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
-	run_command rm $DOWNLOADS/alacritty.man
+	run_command gzip -c $LOCAL_DOWNLOADS/alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
+	remove_file $LOCAL_DOWNLOADS/alacritty.man
 
 	run_command mkdir -p ~/.zsh_functions
 	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/completions/_alacritty > ~/.zsh_functions/_alacrity
 
-	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.info > $DOWNLOADS/alacritty.info
-	run_command sudo tic -xe alacritty,alacritty-direct $DOWNLOADS/alacritty.info
-	run_command rm $DOWNLOADS/alacritty.info
+	run_command curl https://github.com/jwilm/alacritty/blob/master/extra/alacritty.info > $LOCAL_DOWNLOADS/alacritty.info
+	run_command sudo tic -xe alacritty,alacritty-direct $LOCAL_DOWNLOADS/alacritty.info
+	remove_file $LOCAL_DOWNLOADS/alacritty.info
 fi

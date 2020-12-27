@@ -2,9 +2,9 @@ if [[ $ACTION = install ]] ; then
 	log-debug "+++ installing homebrew package manager"
 	if [[ $OSSYS = macos ]] ; then
 	    if [ ! -d "/usr/local/Homebrew" ]; then
-	 		run_command curl -fsSL -o $DOWNLOADS/brew-install.rb https://raw.githubusercontent.com/Homebrew/install/master/install
+	 		run_command curl -fsSL -o $LOCAL_DOWNLOADS/brew-install.rb https://raw.githubusercontent.com/Homebrew/install/master/install
 	 		run_command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
-	 		remove_file $DOWNLOADS/brew-install.rb
+	 		remove_file $LOCAL_DOWNLOADS/brew-install.rb
 			run_command brew tap 'homebrew/services'
 			run_command brew services
 	    fi

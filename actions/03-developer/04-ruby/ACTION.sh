@@ -1,7 +1,7 @@
 install_package ruby
-run_command curl -sSL https://get.rvm.io -o $DOWNLOADS/rvm.sh
-run_command bash $DOWNLOADS/rvm.sh stable
-remove_file $DOWNLOADS/rvm.sh
+run_command curl -sSL https://get.rvm.io -o $LOCAL_DOWNLOADS/rvm.sh
+run_command bash $LOCAL_DOWNLOADS/rvm.sh stable
+remove_file $LOCAL_DOWNLOADS/rvm.sh
 
 link_env_file ruby
 

@@ -9,9 +9,9 @@ OSARCH=`uname -m`
 INSTALLER=
 APP_INSTALLER=
 UPDATER=
-DOWNLOADS=$HOME/Downloads
 LOCAL_BIN=$HOME/bin
 LOCAL_CONFIG=$HOME/.config
+LOCAL_DOWNLOADS=$HOME/Downloads
 
 ACTION=install
 ACTION_ARGS=
@@ -78,8 +78,8 @@ decode_os_type() {
 		fi
     fi
 
-    if [ ! -d "$DOWNLOADS" ] ; then
-		run_command mkdir $DOWNLOADS
+    if [ ! -d "$LOCAL_DOWNLOADS" ] ; then
+		run_command mkdir $LOCAL_DOWNLOADS
     fi
 }
 
@@ -140,8 +140,8 @@ show_actions() {
 run_actions () {
     log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
     log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
-    log-info "Downloading temp files to $DOWNLOADS"
-	make_dir $DOWNLOADS
+    log-info "Downloading temp files to $LOCAL_DOWNLOADS"
+	make_dir $LOCAL_DOWNLOADS
     log-info "Using binary file dir $LOCAL_BIN"
     make_dir $LOCAL_BIN
     log-info "Using configuration dir $LOCAL_CONFIG"

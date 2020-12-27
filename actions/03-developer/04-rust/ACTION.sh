@@ -1,8 +1,8 @@
 if [[ $ACTION = install ]] ; then
     log-debug "+++ installing rustup"
-    run_command curl  -sSf -o "$DOWNLOADS/sh.rustup.rs" https://sh.rustup.rs
-	run_command sh "$DOWNLOADS/sh.rustup.rs" -y -v --no-modify-path
-	remove_file "$DOWNLOADS/sh.rustup.rs"
+    run_command curl  -sSf -o "$LOCAL_DOWNLOADS/sh.rustup.rs" https://sh.rustup.rs
+	run_command sh "$LOCAL_DOWNLOADS/sh.rustup.rs" -y -v --no-modify-path
+	remove_file "$LOCAL_DOWNLOADS/sh.rustup.rs"
 	run_command source "$HOME/.cargo/env"
 
 	# This should be the default, but just in case...

@@ -66,29 +66,29 @@ The three options `-i`, `-l`, and `-u` determine how much of the script is run. 
 ## Library Functions & Variables
 
 * **Variables**
-  * `ACTION`
-  * `ACTION_ARGS`
-  * `ACTION_FILE`
-  * `INSTALLER` `APP_INSTALLER` `UPDATER`
-  * `LOCAL_BIN`
-  * `LOCAL_CONFIG`
-  * `LOCAL_DOWNLOADS`
-  * `OPSYS`
-  * `OSARCH` `OSDIST` `OSVERSION`
-  * `LOGLEVEL`
+  * `ACTION` - the current action, one of: 'install', 'update', 'link'.
+  * `ACTION_ARGS` - any arguments required by the action, usually the group/action path.
+  * `ACTION_FILE` - the name of the file to look for in the action directory, by default this is `ACTION.sh`.
+  * `INSTALLER` `APP_INSTALLER` `UPDATER` - the O/S dependent name of the installer commands to use.
+  * `LOCAL_BIN` - local directory to store binaries.
+  * `LOCAL_CONFIG` - local directory for config files.
+  * `LOCAL_DOWNLOADS` - local directory for downloads and temporary files.
+  * `OPSYS` - operating system, e.g. 'macos', 'linux', 'windows'.
+  * `OSARCH` `OSDIST` `OSVERSION` - operating system architecture, distribution, and version.
+  * `LOGLEVEL` - level to log messages, `setup.zsh` sets this with the `-v` and `-V` options.
 * **Logging**
-  * `log-critical` 
-  * `log-error` 
-  * `log-warning` 
-  * `log-info` 
-  * `log-debug` 
-  * `echo_bright` 
-  * `echo_instruction`
+  * `log-critical` - log a critical error, this will terminate the setup.
+  * `log-error`  - log an error.
+  * `log-warning` - log a warning.
+  * `log-info` - log informational message.
+  * `log-debug` - log a debugging message.
+  * `echo_bright` - echo to standard outbut in a bright color.
+  * `echo_instruction` - echo an instruction to the standard output.
 * **Actions**
-  * `install_package` 
-  * `install_package_for` 
-  * `link_env_file` 
-  * `link_file` 
-  * `make_dir` 
-  * `remove_file` 
-  * `run_command` 
+  * `install_package` - install a package using the O/S specific installer.
+  * `install_package_for` - install a package, for a given O/S only.
+  * `link_env_file` - link an `env` file into the config directory.
+  * `link_file`  - create a symlink for a file in this repo to it's local location.
+  * `make_dir` - make a local directory.
+  * `remove_file` - remove a local file.
+  * `run_command` - run any command not covered above.

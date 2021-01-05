@@ -79,7 +79,7 @@ decode_os_type() {
     fi
 
     if [ ! -d "$LOCAL_DOWNLOADS" ] ; then
-		run_command mkdir $LOCAL_DOWNLOADS
+		make_dir $LOCAL_DOWNLOADS
     fi
 }
 
@@ -93,12 +93,13 @@ parse_action() {
 	-h)  echo_bright "NAME";
 	     echo "\tsetup.zsh - setup environment, cross-platform";
 	     echo_bright "SYNOPSIS";
-	     echo "\tsetup.zsh [-v -V] [-i -u -l -s -h]";
+	     echo "\tsetup.zsh [-v -V] [-i -u -l -s -h] [group/action]";
 	     echo_bright "DESCRIPTION";
              echo "\t-h\tshow help";
-             echo "\t-i\trun all install actions (default)";
+             echo "\t-i\tinstall actions (default)";
+             echo "\t-u\tupdate actions";
+             echo "\t-r\tremove actions";
              echo "\t-l\tlink files only";
-             echo "\t-u\tupgrade only actions";
              echo "\t-s\tshow actions";
              echo "\t-v\tverbose mode";
              echo "\t-V\tvery verbose mode";
@@ -106,6 +107,7 @@ parse_action() {
 	     exit 0;;
 	-i)  ACTION=install; shift; ACTION_ARGS=$@;;
 	-u)  ACTION=update; shift; ACTION_ARGS=$@;;
+	-r)  ACTION=uninstall; shift; ACTION_ARGS=$@;;
 	-l)  ACTION=link; shift; ACTION_ARGS=$@;;
 	-s)  show_actions ; 
 		 exit 0;;
@@ -140,7 +142,7 @@ show_actions() {
 run_actions () {
     log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
     log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
-    log-info "Downloading temp files to $LOCAL_DOWNLOADS"
+    log-info "Using download file dir $LOCAL_DOWNLOADS"
 	make_dir $LOCAL_DOWNLOADS
     log-info "Using binary file dir $LOCAL_BIN"
     make_dir $LOCAL_BIN
@@ -149,7 +151,7 @@ run_actions () {
 
 	if [[ -f "$ACTIONDIR/$ACTION_ARGS/$ACTION_FILE" ]] ; then
 		run_item_actions "$ACTIONDIR/$ACTION_ARGS"
-	else
+	elif [[ "$ACTION_ARGS" == "" ]] ; then
 		log-info "Enumerating action groups in $ACTIONDIR"
 		for dir in $ACTIONDIR/0*; do
 			if [[ ! $dir:t = "00" && -d $dir ]] ; then
@@ -157,6 +159,8 @@ run_actions () {
 	 			run_group_actions $dir
 	 		fi
 		done
+	else
+		log-error "Specified action $ACTION_ARGS not found in $ACTIONDIR."
 	fi
 }
 
@@ -195,14 +199,17 @@ run_command() {
 }
 
 install_package_for() {
-    if [[ $OSSYS = $1* && $ACTION = install ]] ; then
+    if [[ $OSSYS = $1* ]] ; then
+    	log-debug "+++ O/S match: $1"
 		shift
 		install_package $@
+	else
+		log-debug "+++ skipping $ACTION, not O/S $1"
     fi
 }
 
 install_package() {
-    if [[ $ACTION = (install|update) ]] ; then
+    if [[ $ACTION = (install|update|uninstall) ]] ; then
 		local _action=$ACTION
 		if [[ $ACTION = update && $UPDATER != "" ]] ; then
 		    _action=$UPDATER
@@ -210,24 +217,24 @@ install_package() {
 		log-debug "+++ performing $_action for ${(j. .)@}"
 		case $1
 		in
-		    -app)
-			shift
-			if [[ $OSSYS = macos ]] ; then
-				run_command $APP_INSTALLER $_action --cask $@
-			else
-				run_command $APP_INSTALLER $_action $@
-			fi
-			;;
+		    -app)	
+				shift;
+				if [[ $OSSYS = macos ]] ; then
+					run_command $APP_INSTALLER $_action --cask $@
+				else
+					run_command $APP_INSTALLER $_action $@
+				fi
+				;;
 		    -python)
-			shift
-			run_command conda $ACTION --yes $@
-			;;
+				shift;
+				run_command conda $ACTION --yes $@
+				;;
 		    -racket)
-			shift
-			run_command raco pkg $ACTION --deps search-auto $@
-			;;
+				shift;
+				run_command raco pkg $ACTION --deps search-auto $@
+				;;
 		    *)
-			run_command $INSTALLER $_action $@ ;;
+				run_command $INSTALLER $_action $@ ;;
 		esac
     fi
 }
@@ -243,6 +250,15 @@ make_dir() {
     fi
 }
 
+remove_dir() {
+	if [[ -e "$1" && -d "$1" ]] ; then
+		log-debug "Removing directory $1"
+		run_command rmdir "$1"
+	else
+		log-warning "Directory $1 does not exist."
+	fi
+}
+
 remove_file() {
 	if [[ -e "$1" ]] ; then
 		log-debug "Removing file $1"
@@ -254,8 +270,11 @@ remove_file() {
 
 link_env_file() {
 	if [[ $ACTION = (install|update|link) ]] ; then
-		run_command mkdir -p "$LOCAL_CONFIG/$1"
+		make_dir "$LOCAL_CONFIG/$1"
 		link_file "$1-env" "$LOCAL_CONFIG/$1/env"
+	elif [[ $ACTION = (uninstall) ]] ; then
+		remove_file "$LOCAL_CONFIG/$1/env"
+		remove_dir "$LOCAL_CONFIG/$1"
 	fi
 }
 
@@ -266,5 +285,7 @@ link_file() {
 		else
 		    log-warning "file $1 doesn't exist in $CURR_ACTION."
 		fi
+	elif [[ $ACTION = (uninstall) ]] ; then
+		remove_file "$2"
     fi
 }

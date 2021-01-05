@@ -1,9 +1,6 @@
 if [[ $ACTION = (install|update) ]] ; then
 	if [[ $OSSYS = macos ]] ; then
-	    log-debug "+++ installing Docker desktop (from disk image)"
-	    run_command curl -o $LOCAL_DOWNLOADS/Docker.dmg "https://download.docker.com/mac/stable/Docker.dmg"
-	    run_command open $LOCAL_DOWNLOADS/Docker.dmg
-	    log-debug "!!! leaving $LOCAL_DOWNLOADS/Docker.dmg"
+		install_package_for macos -app docker
 	else
 	    log-debug "+++ installing Docker CLI"
 	    install_package apt-transport-https ca-certificates curl gnupg-agent software-properties-common

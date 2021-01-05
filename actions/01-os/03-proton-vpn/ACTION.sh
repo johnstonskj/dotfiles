@@ -1,4 +1,4 @@
-if [[ $OSSYS = linux && $ACTION = (install|update) ]] ; then
+if [[ $OSSYS = linux && $ACTION = (install|update|uninstall) ]] ; then
 	log-debug "+++ install openvpn packages"
 	install_package_for linux openvpn network-manager-openvpn-gnome resolvconf
 	if [[ "$1" = "" ]] ; then
@@ -14,8 +14,6 @@ if [[ $OSSYS = linux && $ACTION = (install|update) ]] ; then
  	remove_file $LOCAL_DOWNLOADS/protonvpn-$_country.ovpn
  	remove_file $LOCAL_DOWNLOADS/protonvpn-cli.sh
 
-elif [[ $OSSYS = macos && $ACTION = (install|update) ]] ; then
-	run_command curl -o $LOCAL_DOWNLOADS/protonvpn.dmg "https://protonvpn.com/download/ProtonVPN.dmg"
-	open $LOCAL_DOWNLOADS/protonvpn.dmg
- 	log-debug "!!! leaving $LOCAL_DOWNLOADS/protonvpn.dmg"
+elif [[ $OSSYS = macos ]] ; then
+	install_package_for macos -app protonvpn
 fi

@@ -1,4 +1,4 @@
-if [[ $ACTION = (install|update) ]] ; then
+if [[ $ACTION = (install|update|uninstall) ]] ; then
 	log-debug "+++ installing zsh"
 	install_package zsh zsh-completions
 	install_package_for macos zsh-navigation-tools
@@ -14,7 +14,7 @@ if [[ $ACTION = install ]] ; then
 	run_command chmod go-w '/user/local/share'
 fi
     
-if [[ $ACTION = (install|update|link) ]] ; then
+if [[ $ACTION = (install|update|uninstall|link) ]] ; then
 	log-debug "+++ linking zsh dot files"
 	# See https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
 	link_file dot-zshenv $HOME/.zshenv

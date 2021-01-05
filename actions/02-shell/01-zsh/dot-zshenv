@@ -2,24 +2,19 @@
 # Basic Environment
 ############################################################################
 
-export ZSH="$HOME/.oh-my-zsh"
 export LC_ALL=en_US.UTF-8
-export PAGER=less
-export VISUAL=emacs
+
 export TERM="xterm-256color"
 export GPG_TTY=$(tty)
 
-############################################################################
-# Preferred editor for local and remote sessions
-############################################################################
+export PAGER=less
 
+export VISUAL=emacs
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
     export EDITOR='emacs'
 fi
-
-export EMACS_CONF=$HOME/.emacs.d
 
 ############################################################################
 # Setup the base directory for customized files
@@ -27,6 +22,35 @@ export EMACS_CONF=$HOME/.emacs.d
 
 export DOTFILEDIR=$(dirname $(/usr/local/bin/greadlink -f ~/.zshenv))
 export PATH=$DOTFILEDIR/bin:$PATH
+
+############################################################################
+# Prompt/Path/Environment customizations
+############################################################################
+
+if [ -d "$HOME/bin" ] ; then
+    PATH=$HOME/bin:$PATH
+fi
+
+if [ -d "/usr/local" ] ; then
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/sbin:$PATH
+    export MANPATH=/usr/local/man:$MANPATH
+fi
+
+export ARCHFLAGS="-arch x86_64"
+
+export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+############################################################################
+# Package-specific customizations
+############################################################################
+
+export LOCAL_CONFIG=$HOME/.config
+
+for dir in $LOCAL_CONFIG/*; do
+  if [[ -d $dir && -f $dir/env ]] ; then
+    source $dir/env
+  fi
+done
 
 ############################################################################
 # Just in case......

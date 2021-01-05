@@ -1,9 +1,8 @@
 ############################################################################
-# Top-level stuff
+# Flags
 ############################################################################
 
 ENABLE_CORRECTION="true"
-
 COMPLETION_WAITING_DOTS="true"
 
 ############################################################################
@@ -25,23 +24,6 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
 	      source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
     fi
 fi
-
-############################################################################
-# Prompt/Path/Environment customizations
-############################################################################
-
-if [ -d "$HOME/bin" ] ; then
-    PATH=$HOME/bin:$PATH
-fi
-
-if [ -d "/usr/local" ] ; then
-    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/sbin:$PATH
-    export MANPATH=/usr/local/man:$MANPATH
-fi
-
-export ARCHFLAGS="-arch x86_64"
-
-export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 ############################################################################
 # Aliases
@@ -81,42 +63,6 @@ alias myip='curl http://ipecho.net/plain; echo'
 # Docker image commands
 alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'
 alias docker-ubuntu='docker run -it ubuntu bash'
-
-############################################################################
-# Package-specific customizations
-############################################################################
-
-export LOCAL_CONFIG=$HOME/.config
-
-#>>>>>>>>>> LLVM
-source $LOCAL_CONFIG/llvm/env
-
-#>>>>>>>>>> Python (Anaconda)
-source $LOCAL_CONFIG/python/env
-
-#>>>>>>>>>> Ruby
-source $LOCAL_CONFIG/ruby/env
-
-#>>>>>>>>>> Ruby (Homebrew)
-export PATH=/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH
-
-#>>>>>>>>>> Rust
-source $HOME/.cargo/env
-
-#>>>>>>>>>> iTerm2
-if [ -e "${HOME}/.iterm2_shell_integration.zsh" ] ; then
-     source "${HOME}/.iterm2_shell_integration.zsh"
-fi
-
-#>>>>>>>>>> IDEA Plugins
-export IDEA_PLUGINS=/Applications/IntelliJ\ IDEA\ CE.app/Contents/plugins
-export KOTLIN_HOME=$IDEA_PLUGINS/Kotlin
-export PATH=$PATH:$KOTLIN_HOME/kotlinc/bin
-
-#>>>>>>>>>> Travis CI
-if [ -f "~/.tyravis/travis.sh" ]; then
-   source ~/.travis/travis.sh
-fi
 
 ############################################################################
 # Just in case......

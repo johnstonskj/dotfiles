@@ -19,19 +19,16 @@ if [[ $ACTION = install ]] ; then
 		log-debug "+++ +++ component $line"
 	    run_command rustup component add $line
 	done < "$CURR_ACTION/rs-components"
-	run_command echo 'export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"' >>$HOME/.cargo/env
 fi
 
 if [[ $ACTION = update ]] ; then
 	rustup update
 fi
 
-if [[ $ACTION = (install|update) ]] ; then
-	install_package_for macos rustc-completion
-fi
+install_package_for macos rustc-completion
 
-if [[ $ACTION = (install|update|link) ]] ; then
-	link_file cargo-publish $LOCAL_BIN/cargo-publish
-	link_file cargo-verify $LOCAL_BIN/cargo-verify
-	link_file rust-update $LOCAL_BIN/rust-update
-fi
+link_env_file rust
+
+link_file cargo-publish $LOCAL_BIN/cargo-publish
+link_file cargo-verify $LOCAL_BIN/cargo-verify
+link_file rust-update $LOCAL_BIN/rust-update

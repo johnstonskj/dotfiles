@@ -4,6 +4,8 @@ install_package_for linux emacs-nox elpa-racket-mode
 install_package_for macos emacs
 install_package_for macos -app font-linux-libertine
 
+link_env_file emacs
+
 if [[ $ACTION = (install|update|link) ]] ; then
     make_dir $EMACS_CONF/lib
 	link_file init.el $EMACS_CONF/init.el

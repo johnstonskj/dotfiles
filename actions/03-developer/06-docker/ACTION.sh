@@ -21,13 +21,16 @@ if [[ $ACTION = (install|update) ]] ; then
 			run_command sudo systemctl enable docker
 	    fi
 	fi
-	log-debug "+++ pulling Docker images from $DOTFILEDIR/docker-images"
+fi
+
+if [[ $ACTION = update ]] ; then
+	log-debug "+++ pulling Docker images from $CURR_ACTION/docker-images"
+	source "$CURR_ACTION/docker-env"
+	docker run -d
 	while IFS= read -r line; do
 		log-debug "+++ +++ docker image $line"
 	    run_command docker pull $line
-	done < "$DOTFILEDIR/docker-images"
+	done < "$CURR_ACTION/docker-images"
 fi
 
-if [[ $ACTION = install ]] ; then
-	echo_instruction "docker run hello-world"
-fi
+link_env_file docker

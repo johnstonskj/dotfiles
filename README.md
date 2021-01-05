@@ -90,5 +90,6 @@ The three options `-i`, `-l`, and `-u` determine how much of the script is run. 
   * `link_env_file` - link an `env` file into the config directory.
   * `link_file`  - create a symlink for a file in this repo to it's local location.
   * `make_dir` - make a local directory.
+  * `remove_dir` - remove a local directory.
   * `remove_file` - remove a local file.
   * `run_command` - run any command not covered above.

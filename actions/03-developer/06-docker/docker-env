@@ -1,0 +1,2 @@
+export DOCKER_HOME=/Applications/Docker.app/Contents/Resources
+export PATH=$PATH:$DOCKER_HOME/bin

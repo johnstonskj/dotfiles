@@ -1,7 +1,7 @@
 if [[ $OSSYS = linux && $ACTION = (install|update|uninstall) ]] ; then
 	log-debug "+++ install openssh packages"
 	local SSHDCONF=/etc/ssh/sshd_config
-	install_package linux openssh-server
+	install_package openssh-server
 
 	if [[ $ACTION = install ]] ; then
 	    log-debug "+++ setting openssh config"

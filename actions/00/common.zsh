@@ -22,6 +22,12 @@ ACTION_FILE=ACTION.sh
 # Pre-install stuff
 ############################################################################
 
+link_self_bin() {
+	if [[ ! -f "$LOCAL_BIN/$CMD_FILE" ]] ; then
+		run_command ln -s "$DOTFILEDIR/$CMD_FILE" "$LOCAL_BIN/$CMD_FILE"
+	fi
+}
+
 check_not_sudo() {
     if [[ $UID == 0 || $EUID == 0 ]]; then
         log-critical "Cannot run as root, run with -h for options"
@@ -87,60 +93,188 @@ decode_os_type() {
 # Command-line stuff
 ############################################################################
 
-parse_action() {
+parse_command_line() {
     case $1
     in
-	-h)  echo_bright "NAME";
-	     echo "\tsetup.zsh - setup environment, cross-platform";
-	     echo_bright "SYNOPSIS";
-	     echo "\tsetup.zsh [-v -V] [-i -u -l -s -h] [group/action]";
-	     echo_bright "DESCRIPTION";
-             echo "\t-h\tshow help";
-             echo "\t-i\tinstall actions (default)";
-             echo "\t-u\tupdate actions";
-             echo "\t-r\tremove actions";
-             echo "\t-l\tlink files only";
-             echo "\t-s\tshow actions";
-             echo "\t-v\tverbose mode";
-             echo "\t-V\tvery verbose mode";
-	     echo "\nDo not run this command in sudo mode, it will ask for passwords when it needs them"
-	     exit 0;;
-	-i)  ACTION=install; shift; ACTION_ARGS=$@;;
-	-u)  ACTION=update; shift; ACTION_ARGS=$@;;
-	-r)  ACTION=uninstall; shift; ACTION_ARGS=$@;;
-	-l)  ACTION=link; shift; ACTION_ARGS=$@;;
-	-s)  show_actions ; 
-		 exit 0;;
-	-v)  shift;
-	     LOGLEVEL=3;
-	     parse_action $*;;
-	-V)  shift;
-	     LOGLEVEL=4;
-	     parse_action $*;;
+    help)
+		ACTION=help;;
+	install)
+		ACTION=install;;
+	update)
+		ACTION=update;;
+	remove)
+		ACTION=uninstall;;
+	link)
+		ACTION=link;;
+	group)
+		ACTION=cfg-groups;;
+	action)
+		ACTION=cfg-actions;;
+	list)
+		ACTION=list;;
+	-v)
+	    LOGLEVEL=3;
+		shift;
+	    parse_command_line $*;;
+	-V)
+	    LOGLEVEL=4;
+		shift;
+	    parse_command_line $*;;
 	*)  
-		 ACTION=install; ACTION_ARGS=$@;;
+		ACTION=execute;;
     esac
+    ACTION_ARGS=(${@:2:4})
 }
 
 ############################################################################
 # Drivers
 ############################################################################
 
-show_actions() {
+run_inner_command() {
+	log-debug "ACTION=$ACTION, ACTION_ARGS='${ACTION_ARGS[@]}' (${#ACTION_ARGS})"
+	case $ACTION
+	in
+	install|update|uninstall|link)
+		cmd_install;;
+	list)
+		cmd_list_actions;;
+	cfg-groups)
+		cmd_manage_groups;;
+	cfg-actions)
+		cmd_manage_actions;;
+	refresh)
+		cmd_refresh_repo;;
+	execute)
+		cmd_exec_sub_command;;
+	*)
+		cmd_help;;
+	esac
+}
+
+cmd_help() {
+	echo_bright "NAME";
+	echo "\t$CMD_FILE - setup environment, cross-platform";
+	echo_bright "SYNOPSIS";
+	echo "\t$CMD_FILE [-v -V] COMMAND";
+	echo_bright "DESCRIPTION";
+	echo "Run commands to ensure consistency of machine environment across machines."
+	echo "Do not run this command in sudo mode, it will ask for passwords when it needs them"
+	echo ""
+	echo "\t-v\tverbose mode";
+	echo "\t-V\tvery verbose mode";
+	echo_bright "COMMANDS";
+	echo "\thelp\tshow help";
+	echo "\tinstall\tinstall actions (default)";
+	echo "\tupdate\tupdate actions";
+	echo "\tremove\tremove actions";
+	echo "\tlink\tlink files only";
+	echo "\tlist\tlist actions";
+	echo "\tgroup\tmanage groups";
+	echo "\taction\tmanage actions";
+	echo "\trefresh\trefresh local repository";
+	exit 0
+}
+
+cmd_list_actions() {
 	for gdir in $ACTIONDIR/0*; do
 		if [[ ! $gdir:t = "00" && -d $gdir ]] ; then
-			echo "- $gdir:t/"
 			for idir in $gdir/*; do
 				if [[ -d $idir && -e $idir/$ACTION_FILE ]] ; then
-		 			echo "    - $idir:t"
+		 			echo "$gdir:t/$idir:t"
 		 		fi
 			done
  		fi
 	done
+	exit 0
 }
 
-run_actions () {
-    log-info "Performing $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
+cmd_manage_groups() {
+	case $ACTION_ARGS[1]
+	in
+	new)
+		if [[ ${#ACTION_ARGS} -ge 2 ]] ; then
+			local new_name="$ACTION_ARGS[2]"
+			if [[ "$new_name" = "" ]] ; then
+				log-critical "Specify a new group name."
+			elif [[ $new_name =~ "/" ]] ; then
+				log-error "Group name may not be a path."
+			elif [[ ! $new_name =~ "^[0-9]+\-" ]] ; then
+				log-error "Group names should start with two digits."
+			else
+				make_dir "$ACTIONDIR/$new_name"
+			fi
+		else
+			log-error "New group name required."
+		fi;;
+	list) 
+		for gdir in $ACTIONDIR/0*; do
+			if [[ ! $gdir:t = "00" && -d $gdir ]] ; then
+				echo "$gdir:t"
+			fi
+		done;;
+	*) 
+		cmd_help;;
+	esac
+}
+
+cmd_manage_actions() {
+	echo $0
+	case $ACTION_ARGS[1]
+	in
+	new)
+		if [[ ${#ACTION_ARGS} -ge 3 ]] ; then
+			local group="$ACTIONDIR/$ACTION_ARGS[2]"
+			local new_name="$ACTION_ARGS[3]"
+			if [[ ! -d $group ]] ; then
+				log-error "Group $group is not a group folder."
+			elif [[ "$new_name" = "" ]] ; then
+				log-critical "Specify a new action name."
+			elif [[ $new_name =~ "/" ]] ; then
+				log-error "Action name may not be a path."
+			elif [[ ! $new_name =~ "^[0-9]+\-" ]] ; then
+				log-error "Action names should start with two digits."
+			else
+				make_dir "$group/$new_name"
+				if [[ ! -e "$group/$new_name/$ACTION_FILE" ]] ; then
+					echo "# Action file for $new_name" > "$group/$new_name/$ACTION_FILE"
+				fi
+				$VISUAL "$group/$new_name/$ACTION_FILE"
+			fi
+		else
+			log-error "New action name required."
+		fi;;
+	edit)
+		if [[ ${#ACTION_ARGS} -ge 3 ]] ; then
+			local action_file="$ACTIONDIR/$ACTION_ARGS[2]/$ACTION_ARGS[3]/$ACTION_FILE"
+			log-debug $action_file
+			if [[ ! -f $action_file ]] ; then
+				log-error "No action file for group $ACTION_ARGS[2], action $ACTION_ARGS[3]."
+			else
+				$VISUAL "$action_file"
+			fi
+		else
+			log-error "New action name required."
+		fi;;
+	list) 
+		if [[ ${#ACTION_ARGS} -ge 2 ]] ; then
+			local gdir="$ACTIONDIR/$ACTION_ARGS[2]"
+			if [[ ! $gdir:t = "00" && -d $gdir ]] ; then
+				for idir in $gdir/*; do
+					if [[ -d $idir && -e $idir/$ACTION_FILE ]] ; then
+			 			echo "$gdir:t/$idir:t"
+			 		fi
+				done
+			fi
+		else
+			log-error "Group name to list required."
+		fi;;
+	*) 
+		cmd_help;;
+	esac
+}
+
+cmd_install () {
+    log-info "Performing install $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
     log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
     log-info "Using download file dir $LOCAL_DOWNLOADS"
 	make_dir $LOCAL_DOWNLOADS
@@ -156,7 +290,7 @@ run_actions () {
 		for dir in $ACTIONDIR/0*; do
 			if [[ ! $dir:t = "00" && -d $dir ]] ; then
 				log-info "Enumerating action group: $dir"
-	 			run_group_actions $dir
+	 			cmd_install_groups $dir
 	 		fi
 		done
 	else
@@ -164,21 +298,32 @@ run_actions () {
 	fi
 }
 
-run_group_actions () {
+cmd_install_groups () {
 	for dir in $1/0*; do
 		if [[ -d $dir ]] ; then
 			log-info "Checking action item: $dir"
- 			run_item_actions $dir
+ 			cmd_install_actions $dir
  		fi
 	done
 }
 
-run_item_actions () {
+cmd_install_actions () {
 	if [[ -e $1/$ACTION_FILE ]] ; then
 		CURR_ACTION=$1
 		log-info "Running actions in: $CURR_ACTION/$ACTION_FILE"
 		source "$CURR_ACTION/$ACTION_FILE"
 	fi
+}
+
+cmd_exec_sub_command() {
+	log-error "currently unsupported"
+}
+
+cmd_refresh_repo() {
+	log-info "Refreshing local repository in $DOTFILEDIR."
+	pushd $DOTFILEDIR
+	run_command git pull
+	popd
 }
 
 ############################################################################
@@ -242,7 +387,9 @@ install_package() {
 make_dir() {
     if [[ -e $1 ]] ; then
     	if [[ ! -d $1 ]] ; then
-    		log-error "$1 exists, but is not a directory."
+    		log-error "Name $1 exists, but is not a directory."
+    	else
+    		log-warning "Directory $1 already exists."
     	fi
     else
     	log-debug "Making new directory $1"
@@ -252,19 +399,19 @@ make_dir() {
 
 remove_dir() {
 	if [[ -e "$1" && -d "$1" ]] ; then
-		log-debug "Removing directory $1"
+		log-debug "Removing directory $1."
 		run_command rmdir "$1"
 	else
-		log-warning "Directory $1 does not exist."
+		log-warning "Directory $1 does not exist, or name is not a directory."
 	fi
 }
 
 remove_file() {
-	if [[ -e "$1" ]] ; then
-		log-debug "Removing file $1"
+	if [[ -e "$1" && -f "$1" ]] ; then
+		log-debug "Removing file $1."
 		run_command rm "$1"
 	else
-		log-warning "File $1 does not exist."
+		log-warning "File $1 does not exist, or name is not a file."
 	fi
 }
 

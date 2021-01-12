@@ -284,7 +284,7 @@ cmd_install () {
     make_dir $LOCAL_CONFIG
 
 	if [[ -f "$ACTIONDIR/$ACTION_ARGS/$ACTION_FILE" ]] ; then
-		run_item_actions "$ACTIONDIR/$ACTION_ARGS"
+		cmd_install_actions "$ACTIONDIR/$ACTION_ARGS"
 	elif [[ "$ACTION_ARGS" == "" ]] ; then
 		log-info "Enumerating action groups in $ACTIONDIR"
 		for dir in $ACTIONDIR/0*; do

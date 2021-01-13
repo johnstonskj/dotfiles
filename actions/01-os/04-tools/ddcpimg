@@ -1,0 +1,334 @@
+#!/usr/bin/env racket
+#lang racket/base
+
+(require racket/bool racket/date racket/file racket/format racket/list
+         racket/match racket/path racket/port racket/string racket/system)
+
+;; --------------------------------------------------------------------------------------------------
+
+(define *process-name*
+  (let-values ([(base name must-be-dir?) (split-path (find-system-path 'run-file))])
+    (path->string name)))
+
+(define *default-dst* "./copied_photos")
+
+(define *command* (format "~a/.cargo/bin/fselect" (getenv "HOME")))
+
+(define *query* "sha256, size, created, exif_datetime, path from ~a where is_file=true and is_image=true order by sha256 into tabs")
+
+(define *overwrite-existing-files* #f)
+
+;; --------------------------------------------------------------------------------------------------
+
+(define (get-log-level-or level)
+  (let ([logging-env-var (getenv "RACKET_LOG")])
+    (match logging-env-var
+      ["fatal" 'fatal]
+      ["error" 'error]
+      ["warning" 'warning]
+      ["info" 'info]
+      ["debug" 'debug]
+      ["none" 'none]
+      [_ level])))
+
+(define (log-evt-level evt) (vector-ref evt 0))
+(define (log-evt-message evt) (vector-ref evt 1))
+(define (log-evt-value evt) (vector-ref evt 2))
+(define (log-evt-topic evt) (vector-ref evt 3))
+
+(define (init-logging level)
+  (let* ([log-level (get-log-level-or level)]
+         [logger (make-logger 'ddcpimg)]
+         [receiver (make-log-receiver logger log-level)])
+    (current-logger logger)
+    (date-display-format 'iso-8601)
+    (void 
+     (thread 
+      (λ () (let loop () 
+              (define v (sync receiver))
+              (printf "~a [~a] ~a\n"
+                      (date->string (current-date) #t)
+                      (log-evt-level v)
+                      (log-evt-message v))
+              (loop)))))))
+
+(define (pause-for-logger)
+  (sleep 0.1))
+
+(define (exit-fatal msg [exit-code 1])
+  (log-fatal msg)
+  (pause-for-logger)
+  (exit exit-code))
+
+;; --------------------------------------------------------------------------------------------------
+
+(define (get-terminal-width #:default [default 70])
+  (let ([results (with-output-to-string
+                   (λ () (system "tput cols")))])
+    (or (string->number (string-trim results))
+        default)))
+
+(define wrap-overflow-indicator (make-parameter "\\"))
+
+(define (wrap-strings
+         str-list
+         line-width
+         #:margin-left [margin-left 0]
+         #:margin-right [margin-right 0]
+         #:pad-char [pad-char #\space])
+  (wrap-string
+   (string-join str-list " ")
+   line-width
+   #:margin-left margin-left
+   #:margin-right margin-right
+   #:pad-char pad-char))
+
+(define (wrap-string
+         str
+         line-width
+         #:margin-left [margin-left 0]
+         #:margin-right [margin-right 0]
+         #:pad-char [pad-char #\space])
+  (let* ([pad-char (~a pad-char)]
+         [pad-left (~a "" #:width margin-left #:pad-string pad-char)])
+    (for/fold ([curr-line pad-left]
+               [lines '()]
+               #:result (string-join (reverse (list* curr-line lines)) "\n"))
+              ([word (string-split str)])
+      ;; TODO: deal with words > width
+      (if (> (+ (string-length curr-line) (string-length pad-char) (string-length word) margin-right)
+             line-width)
+          (values (string-append pad-left word)
+                  (list* curr-line lines))
+          (values (string-append curr-line (if (string=? curr-line pad-left) "" pad-char) word)
+                  lines)))))
+
+;; --------------------------------------------------------------------------------------------------
+
+(struct file
+  (hash size create-date exif-date path)
+  #:transparent)
+
+;;
+;; Convert the incoming CSV file into a list and normalize values:
+;;
+;; 1. For date/time values select only the date part.
+;; 1. If the camera (EXIF) date is missing, reuse the filesystem date.
+;;
+;; line: string
+;; -> file?
+;;
+(define (line->file line)
+  (define (datetime->date dt) (substring dt 0 10))
+  (let ([columns (string-split line "\t" #:trim? #f #:repeat? #t)])
+    (file
+     (first columns)
+     (second columns)
+     (datetime->date (third columns))
+     (datetime->date 
+      (if (= (length columns) 5)
+          (fourth columns)
+          (third columns)))
+     (last columns))))
+
+;; --------------------------------------------------------------------------------------------------
+
+;;
+;; Reduce the set of values down to only the date to store the copied image and the source path.
+;;
+;; columns: (hash size filesystem-date camera-date src-path)
+;; -> (destination-date . src-path)
+;;
+(define (date-path-pair file)
+  (cons (file-exif-date file) (file-path file)))
+
+;; --------------------------------------------------------------------------------------------------
+
+;;
+;; Copy files from src-path to a new path comprized of the the dst and date-string.
+;;
+;; file-list: (listof (date-string src-path))
+;; src: path-string
+;; dst: path-string
+;;
+(define (copy-files file-list src dst #:dry-run? [dry-run? #f])
+  (for ([src-pair file-list]
+        [file-num (in-naturals 1)])
+    (let* ([dst-dir
+            (format "~a/~a"  dst
+                    (string-replace (car src-pair) "-" "/" #:all? #t))]
+           [dst-path
+            (format "~a/image-~a~a"
+                    dst-dir
+                    (~a file-num #:min-width 8 #:align 'right #:pad-string "0")
+                    (string-downcase (bytes->string/utf-8 (path-get-extension (cdr src-pair)))))])
+      (log-info (format "copying ~a --> ~a" (cdr src-pair) dst-path))
+      (unless dry-run?
+        ;; Ensure path to new file exists.
+        (unless (directory-exists? dst-dir) 
+          (log-debug (format "making date directory ~a" dst-dir))
+          (make-directory* dst-dir))
+        ;; Copy, not move, file to new destination.
+        (copy-file (cdr src-pair) dst-path *overwrite-existing-files*)))))
+
+;;
+;; Pick one of a list of duplicate files. Files are candidate duplicates if their hash matches, an
+;; error occurs if the file sizes do not match. Once this has been ensured pick the file with the
+;; lowest file system date.
+;;
+;; duplicates?: (listof (hash size filesystem-date camera-date src-path))
+;; -> (hash size filesystem-date camera-date src-path)
+;;
+(define (pick-file duplicates?)
+  (cond
+    ;; Actually, no duplicates
+    [(= (length duplicates?) 1)
+     (first duplicates?)]
+    [else
+     (cond
+       ;; if file sizes are all equal...
+       [(for/and ([file duplicates?])
+          (string=? (file-size file) (file-size (first duplicates?))))
+        ;; then pick the file with the lowest file-system date.
+        (log-debug (format "Picking from ~a duplicates: ~a"
+                           (length duplicates?)
+                           (for/list ([dup duplicates?])
+                             (file-path dup))))
+        (foldr (λ (l r)
+                 (if (string<? (file-create-date l) (file-create-date r)) l r))
+               (first duplicates?)
+               (rest duplicates?))]
+       [else
+        ;; Clearly, this SHOULD NOT happen.
+        (exit-fatal
+         (format "files with same hash appear with different sizes: ~a"
+                 (for/list ([dup duplicates?])
+                   (cons (file-size dup) (file-path dup))))
+         2)])]))
+
+;;
+;; Run query, or load saved results.
+;;
+;; src path-string
+;; dst path-string
+;; result-file-name: string
+;; -> port
+;;
+(define (run-query src dst [result-file-name "fselect-results.txt"])
+  (let ([result-file-path (format "~a/~a" dst result-file-name)])
+    (cond
+      [(file-exists? result-file-path)
+       (log-info "Reading existing query results from file")
+       ;; For large systems, this has some value in that you can run fselect without
+       ;; the sort option, then run: `sort -t , -k 1 -o fselect-sorted.csv fselect-results.csv`
+       (open-input-file result-file-path #:mode 'text)]
+      [else
+       (log-info (format "Running fselect: ~a" (format *query* src)))
+       (open-input-string 
+        (let* ([query (format *query* src)]
+               [results (with-output-to-string
+                          (λ () (system* *command* query)))])
+          results))])))
+
+;;
+;; Find all image files within the src path including an SHA256 hash for each. If two files exist
+;; with the same hash, de-dup them and copy them into the dst directory using YYYY/MM/DD directory
+;; structures.
+;;
+;; src: path-string
+;; dst: path-string
+;;
+(define (dedup-and-copy-files src [dst *default-dst*] #:dry-run? [dry-run? #f])
+  (let ([inport (run-query src dst)])
+    (log-info "Processing query results")
+    (copy-files
+     (for/fold ([curr-files '()]
+                [all-files '()]
+                #:result(if (empty? curr-files)
+                            all-files
+                            (list* (date-path-pair (pick-file curr-files)) all-files)))
+               ([line (port->lines inport)])
+       (let ([file (line->file line)])
+         (cond
+           [(empty? curr-files)
+            (values (list file) all-files)]
+           [(string=? (file-hash (first curr-files)) (file-hash file))
+            (log-debug (format "duplicate hash found: ~a" (file-hash file)))
+            (values (list* file curr-files) all-files)]
+           [else
+            (values (list file) (list* (date-path-pair (pick-file curr-files)) all-files))])))
+     src dst #:dry-run? dry-run?)
+    (close-input-port inport)))
+
+;; Quick check, no point in carrying on if the source doesn't exist.
+(define (check-src-exists src)
+  (cond
+    [(directory-exists? src) src]
+    [else
+     (exit-fatal "Source directory does not exist")]))
+
+(define (man-page)
+  (let* ([out-width (get-terminal-width)])
+    (displayln "NAME")
+    (displayln
+     (format "      ~a - De-dup, copy, and organize image files" *process-name*))
+    (newline)
+    (displayln "SYNOPSIS")     
+    (displayln
+     (format "      ~a source-dir [dest-dir=~a]" *process-name* *default-dst*))
+    (newline)
+    (displayln "DESCRIPTION")     
+    (displayln
+     (wrap-strings '("Find all the image files under the root directory `source-dir`, de-dup"
+                     "copies and copy them into the destination folder `dest-dir`. Copied files"
+                     "will be organized into date-hierarchical directories `YYYY/MM/DD/` based"
+                     "on either any present EXIF date embedded in the image, or the file-system"
+                     "date if none is present.")
+                   out-width #:margin-left 6))
+    (newline)
+    (displayln
+     (wrap-strings '("Files are de-dupped based in an SHA-256 hash computed for each (an error"
+                     "is raised if a set of files with the same hash vary by size) and then the"
+                     "file with the earliest file-system date will be chosen to copy.")
+                   out-width #:margin-left 6))
+    (newline)
+    (displayln "PRECOMPUTE")
+    (displayln
+     (wrap-strings '("By default the command `fselect` is called to perform the file system"
+                     "search, however this may fail for very large file sets. To avoid this, the"
+                     "query results may be pre-computed and placed in the file `fselect-results.txt`"
+                     "in the`dest-dir` directory.")
+                   out-width #:margin-left 6))
+    (newline)
+    (displayln "      $ fselect sha256 size created exif_datetime path \\")
+    (displayln "      >   from  old_photos \\")
+    (displayln "      >   where is_image=true \\")
+    (displayln "      >    into tabs > new_photos/fselect-unsorted.txt")
+    (newline)
+    (displayln "      $ sort -t \"\t\" -k 1 -o new_photos/fselect-results.txt \\")
+    (displayln "      >      new_photos/fselect-unsorted.txt")
+    (newline)
+    (displayln "      $ ddcpimg old_photos new_photos")
+    (newline)))
+
+(define (main args)
+  (init-logging 'error)
+  (log-debug (format "~a (de-dup, copy, and organize image files) started" *process-name*))
+  (let ([num-args (vector-length args)])
+    (cond
+      [(= num-args 1)
+       (dedup-and-copy-files
+        (check-src-exists (vector-ref args 0))
+        #:dry-run? #f)]
+      [(= num-args 2)
+       (dedup-and-copy-files
+        (check-src-exists (vector-ref args 0))
+        (vector-ref args 1)
+        #:dry-run? #t)]
+      [else
+       (log-warning "Missing command-line arguments")
+       (man-page)]))
+  (log-debug "Completed")
+  (pause-for-logger))
+
+(main (current-command-line-arguments))

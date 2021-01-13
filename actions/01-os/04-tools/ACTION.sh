@@ -6,3 +6,4 @@ install_package_for linux fd-find
 install_package_for macos fd
 
 link_file lcolor $LOCAL_BIN/lcolor
+link_file ddcpimg $LOCAL_BIN/ddcpimg

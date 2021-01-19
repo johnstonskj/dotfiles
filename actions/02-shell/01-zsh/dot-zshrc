@@ -15,22 +15,23 @@ COMPLETION_WAITING_DOTS="true"
 # Plugin and other customization
 ############################################################################
 
-# Which plugins would you like to load?
 plugins=(git github gnu-utils python pip tmux)
-if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
-    plugins+=(osx)
-	  brew_prefix=$(brew --prefix)
 
-	  if type brew &>/dev/null; then
-  	    FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
-	   
-	      FPATH=$brew_prefix/share/zsh-completions:$FPATH
-	   
-	      FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
-	      source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
-    fi
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+  	plugins+=(osx)
+  	brew_prefix=$(brew --prefix)
+
+  	if type brew &>/dev/null; then
+	    FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
+   
+      	FPATH=$brew_prefix/share/zsh-completions:$FPATH
+   
+      	FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
+     	source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
+	fi
 fi
 
+ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
 ############################################################################

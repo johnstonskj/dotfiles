@@ -1,5 +1,5 @@
-export RUBYVERSION=2.6.3
-export PATH=/usr/local/lib/ruby/gems/$RUBYVERSION/bin:$PATH
+export RUBY_VERSION=2.6.3
+export PATH=/usr/local/lib/ruby/gems/$RUBY_VERSION/bin:$PATH
 export PATH=/usr/local/opt/ruby/bin:$PATH
 
 #export LDFLAGS="-L/usr/local/opt/ruby/lib $LDFLAGS"

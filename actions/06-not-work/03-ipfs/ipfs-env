@@ -1,0 +1,2 @@
+export IPFS_HOME=$HOME/.ipfs
+alias ipfsui='open http://localhost:5001/webui'

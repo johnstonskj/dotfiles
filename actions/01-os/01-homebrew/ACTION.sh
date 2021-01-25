@@ -1,24 +1,11 @@
-if [[ $ACTION = install ]] ; then
-	log-debug "+++ installing homebrew package manager"
-	if [[ $OSSYS = macos ]] ; then
-	    if [ ! -d "/usr/local/Homebrew" ]; then
-	 		run_command curl -fsSL -o $LOCAL_DOWNLOADS/brew-install.rb https://raw.githubusercontent.com/Homebrew/install/master/install
-	 		run_command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
-	 		remove_file $LOCAL_DOWNLOADS/brew-install.rb
-			run_command brew tap 'homebrew/services'
-			run_command brew services
-	    fi
-	fi
+if [[ $ACTION = install && $OSSYS = macos ]] ; then
+	run_command curl -fsSL -o $LOCAL_DOWNLOADS/brew-install.rb https://raw.githubusercontent.com/Homebrew/install/master/install
+	run_command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
+	remove_file $LOCAL_DOWNLOADS/brew-install.rb
 fi
 
-if [[ $ACTION = update ]] ; then
-	log-debug "+++ updating package managers"
+if [[ $ACTION = update && $OSSYS = macos ]] ; then
 	run_command $INSTALLER $ACTION
-	log-debug "+++ running package manager cleanup actions"
-	if [[ $OSSYS = macos ]] ; then
-	    run_command $INSTALLER cleanup
-	    # and maybe ... $INSTALLER doctor
-	else
-	    run_command $INSTALLER autoremove
-	fi
+    run_command $INSTALLER cleanup
+    # and maybe ... $INSTALLER doctor
 fi

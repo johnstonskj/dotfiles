@@ -1,4 +1,5 @@
 install_package gpg
+install_package_for linux pinentry-gtk2
 install_package_for macos pinentry-mac
 
 GPG_HOME=$HOME/.gnupg

@@ -2,27 +2,37 @@
 	name = Simon Johnston
 	email = johnstonskj@gmail.com
 	signingkey = 49CC458D0281805F54A1B65A565B73DB6CC7F708
+
 [color]
 	ui = auto
+
 [core]
 	pager = less -FMRiX
 	editor = emacs
+
 [push]
 	default = simple
+
 [alias]
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%ar%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+
 [credential]
 	helper = cache --timeout=3600
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
+
 [gpg]
-        program = /usr/local/bin/gpg
+    program = /usr/local/bin/gpg
+
 [commit]
-        gpgSign = true
+    gpgSign = true
+
 [mergetool]
-        keepBackup = true
+    keepBackup = true
+
 [tag]
-        forceSignAnnotated = false
+    forceSignAnnotated = false

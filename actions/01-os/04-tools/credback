@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+zip -r "credback-$(date "+%Y%m%d-%H%M%S").zip" \
+    $HOME/.gnupg \
+    $HOME/.ssh \
+    $HOME/.cargo/credentials \
+    $HOME/.config/github-token

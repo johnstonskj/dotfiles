@@ -5,5 +5,6 @@ install_package_for macos coreutils gnu-sed
 install_package_for linux fd-find
 install_package_for macos fd
 
-link_file lcolor $LOCAL_BIN/lcolor
+link_file credback $LOCAL_BIN/ddcpimg
 link_file ddcpimg $LOCAL_BIN/ddcpimg
+link_file lcolor $LOCAL_BIN/lcolor

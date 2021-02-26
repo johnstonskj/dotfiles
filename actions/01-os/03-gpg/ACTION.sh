@@ -5,12 +5,7 @@ install_package_for macos pinentry-mac
 GPG_HOME=$HOME/.gnupg
 
 link_file gpg.conf $GPG_HOME/gpg.conf
-
-if [[ $OPSYS = linux ]] ; then
-	link_file gpg-agent-linux.conf $GPG_HOME/gpg-agent.conf
-if [[ $OPSYS = macos ]] ; then
-	link_file gpg-agent-mac.conf $GPG_HOME/gpg-agent.conf
-fi
+link_file gpg-agent-linux.conf $GPG_HOME/gpg-agent-$OPSYS.conf
 
 if [[ $ACTION = install ]] ; then
 	if [ ! -d $GPG_HOME ] ; then

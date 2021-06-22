@@ -39,6 +39,8 @@
             toml-mode
             yaml-mode
             json-mode
+            ; other
+            geiser-racket
             ))
 
 ;; refresh package list if it is not already available
@@ -57,7 +59,7 @@
 ;; --------------------------------------------------------------------------
 ;; Markdown customization
 
-\(autoload 'markdown-mode "markdown-mode"
+(autoload 'markdown-mode "markdown-mode"
    "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))

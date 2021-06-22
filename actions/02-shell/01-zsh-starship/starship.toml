@@ -18,7 +18,7 @@ style = "bold yellow"
 symbol = " "
 disabled = true
 
-[docker]
+[docker_context]
 symbol = " "
 only_with_files = true
 
@@ -34,8 +34,8 @@ symbol = " "
 [golang]
 symbol = " "
 
-[haskell]
-symbol = " "
+# [haskell]
+# symbol = " "
 
 [hg_branch]
 symbol = " "
@@ -49,6 +49,7 @@ symbol = " "
 [memory_usage]
 symbol = " "
 style = "bold dimmed green"
+threshold = 75
 disabled = false
 
 [nim]
@@ -79,13 +80,13 @@ symbol = " "
 description = "MacOS Version"
 symbol = " "
 command = "/usr/bin/sw_vers -productVersion"
-when = """ test `uname -s` == "Darwin" """
+when = """ test `uname -s` = "Darwin" """
 
 [custom.os-linux]
 symbol = " "
-when = """  """
+when = """ test `uname -s` = "Linux" """
 
 [custom.os-windows]
 symbol = " "
-when = """  """
+when = """ test `uname -s` = "Windows" """
 

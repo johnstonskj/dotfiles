@@ -1,4 +1,4 @@
-export RACKET_VERSION=7.9
+export RACKET_VERSION=8.0
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
    export RACKET_HOME=/Applications/Racket\ v$RACKET_VERSION
    export RACKET_USER=$HOME/Library/Racket/$RACKET_VERSION

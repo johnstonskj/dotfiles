@@ -9,6 +9,7 @@
 [core]
 	pager = less -FMRiX
 	editor = emacs
+	autocrlf = input
 
 [push]
 	default = simple

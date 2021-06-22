@@ -1,1 +1,1 @@
-install_package -app lmms
+#install_package -app lmms

@@ -1,1 +1,0 @@
-install_package -app slack

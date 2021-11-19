@@ -1,12 +1,43 @@
 #! /usr/bin/env zsh
 
 CMD_FILE=$(basename $0)
-DOTFILEDIR=${0:a:h}
-WORKDOTFILEDIR=$DOTFILEDIR/work-dotfiles
+
+############################################################################
+# Common install configuration
+############################################################################
+
+if [ "$DOTFILEDIR" = "" ] ; then
+    if [ -d "$HOME/dotfiles" ] ; then
+        export DOTFILEDIR=$HOME/dotfiles
+    else
+        export DOTFILEDIR=${0:a:h}
+    fi
+fi
+
 ACTIONDIR=$DOTFILEDIR/actions
 
 source $ACTIONDIR/00/logging.zsh
 source $ACTIONDIR/00/common.zsh
+
+############################################################################
+# Work install
+############################################################################
+
+if [ "$WORKDOTFILEDIR" = "" ] ; then
+    if [ -d "$HOME/workdotfiles" ] ; then
+        export WORKDOTFILEDIR=$HOME/workdotfiles
+    fi
+fi
+
+if [ -d "$WORKDOTFILEDIR" ] ; then
+    WORKACTIONDIR=$WORKDOTFILEDIR/actions
+
+    source $WORKACTIONDIR/00/common.zsh
+fi
+
+############################################################################
+# Command-line stuff configuration
+############################################################################
 
 check_not_sudo 
 

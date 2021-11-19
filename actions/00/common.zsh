@@ -99,6 +99,8 @@ parse_command_line() {
 		ACTION=help;;
 	install)
 		ACTION=install;;
+	update-self)
+		ACTION=update-self;;
 	update)
 		ACTION=update;;
 	remove)
@@ -111,6 +113,11 @@ parse_command_line() {
 		ACTION=cfg-actions;;
 	list)
 		ACTION=list;;
+	-w)
+		DOTFILEDIR=$WORKDOTFILEDIR;
+		ACTIONDIR=$WORKACTIONDIR;
+		shift;
+    parse_command_line $*;;
 	-v)
     LOGLEVEL=3;
 		shift;
@@ -123,7 +130,7 @@ parse_command_line() {
 	  log-error "Error: unknown command: $1."
 		ACTION=help;;
   esac
-  ACTION_ARGS=(${@:2:4})
+  ACTION_ARGS=(${@:3:4})
 }
 
 ############################################################################
@@ -132,17 +139,18 @@ parse_command_line() {
 
 run_inner_command() {
 	log-debug "ACTION=$ACTION, ACTION_ARGS='${ACTION_ARGS[@]}' (${#ACTION_ARGS})"
+	log-debug "DOTFILEDIR=$DOTFILEDIR, ACTIONDIR=$ACTIONDIR"
 	case $ACTION in
 	install|update|uninstall|link)
 		cmd_install;;
+	update-self)
+		cmd_update_self;;
 	list)
 		cmd_list_actions;;
 	cfg-groups)
 		cmd_manage_groups;;
 	cfg-actions)
 		cmd_manage_actions;;
-	refresh)
-		cmd_refresh_repo;;
 	execute)
 		cmd_exec_sub_command;;
 	*)
@@ -159,6 +167,7 @@ cmd_help() {
 	echo "Run commands to ensure consistency of machine environment across machines."
 	echo "Do not run this command in sudo mode, it will ask for passwords when it needs them"
 	echo ""
+	echo "\t-w\tuse the work, not common, configuration"
 	echo "\t-v\tverbose mode";
 	echo "\t-V\tvery verbose mode";
 	echo_bright "COMMANDS";
@@ -170,7 +179,7 @@ cmd_help() {
 	echo "\tlist\tlist actions";
 	echo "\tgroup\tmanage groups";
 	echo "\taction\tmanage actions";
-	echo "\trefresh\trefresh local repository";
+	echo "\tupdate-self\tupdate local configuration repositories";
 	exit 0
 }
 
@@ -272,15 +281,29 @@ cmd_manage_actions() {
 	esac
 }
 
+cmd_update_self () {
+	log-info "Updating self"
+	if [[ -f $DOTFILEDIR ]] ; then
+		pushd $DOTFILEDIR
+		run_command git pull --rebase
+		popd
+	fi
+	if [[ -f $WORKDOTFILEDIR ]] ; then
+		pushd $WORKDOTFILEDIR
+		run_command git pull --rebase
+		popd
+	fi
+}
+
 cmd_install () {
-    log-info "Performing install $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
-    log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
-    log-info "Using download file dir $LOCAL_DOWNLOADS"
+  log-info "Performing install $ACTION on $OSSYS ($OSTYPE), DIST=$OSDIST, VERSION=$OSVERSION, ARCH=$OSARCH"
+  log-info "Using install=$INSTALLER, app=$APP_INSTALLER, update=$UPDATER"
+  log-info "Using download file dir $LOCAL_DOWNLOADS"
 	make_dir $LOCAL_DOWNLOADS
-    log-info "Using binary file dir $LOCAL_BIN"
-    make_dir $LOCAL_BIN
-    log-info "Using configuration dir $LOCAL_CONFIG"
-    make_dir $LOCAL_CONFIG
+  log-info "Using binary file dir $LOCAL_BIN"
+  make_dir $LOCAL_BIN
+  log-info "Using configuration dir $LOCAL_CONFIG"
+  make_dir $LOCAL_CONFIG
 
 	if [[ -f "$ACTIONDIR/$ACTION_ARGS/$ACTION_FILE" ]] ; then
 		cmd_install_actions "$ACTIONDIR/$ACTION_ARGS"
@@ -316,13 +339,6 @@ cmd_install_actions () {
 
 cmd_exec_sub_command() {
 	log-error "currently unsupported"
-}
-
-cmd_refresh_repo() {
-	log-info "Refreshing local repository in $DOTFILEDIR."
-	pushd $DOTFILEDIR
-	run_command git pull
-	popd
 }
 
 ############################################################################
@@ -410,6 +426,14 @@ remove_file() {
 		run_command rm "$1"
 	else
 		log-warning "File $1 does not exist, or name is not a file."
+	fi
+}
+
+link_bin_file() {
+	if [[ $ACTION = (install|update|link) ]] ; then
+		link_file "$1" "$LOCAL_BIN/$1"
+	elif [[ $ACTION = (uninstall) ]] ; then
+		remove_file "$LOCAL_BIN/$1"
 	fi
 }
 

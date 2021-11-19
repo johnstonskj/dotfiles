@@ -2,11 +2,6 @@
 # Basic Environment
 ############################################################################
 
-export LC_ALL=en_US.UTF-8
-
-export TERM="xterm-256color"
-export GPG_TTY=$(tty)
-
 export PAGER=less
 
 export VISUAL=emacs
@@ -17,11 +12,12 @@ else
 fi
 
 ############################################################################
-# Setup the base directory for customized files
+# Setup the dotfiles directory
 ############################################################################
 
-export DOTFILEDIR=$(dirname $(/usr/local/bin/greadlink -f ~/.zshenv))
-export PATH=$DOTFILEDIR/bin:$PATH
+if [ -d "$HOME/dotfiles" ] ; then
+    export DOTFILEDIR=$HOME/dotfiles
+fi
 
 ############################################################################
 # Prompt/Path/Environment customizations
@@ -38,7 +34,13 @@ fi
 
 export ARCHFLAGS="-arch x86_64"
 
+############################################################################
+# Security
+############################################################################
+
 export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+export GPG_TTY=$(tty)
 
 ############################################################################
 # Package-specific customizations
@@ -56,8 +58,6 @@ done
 # Just in case......
 ############################################################################
 
-export WORKDOTFILEDIR=$DOTFILEDIR/work-dotfiles
-
-if [ -e "$WORKDOTFILEDIR/work-zshenv" ] ; then
-    source "$WORKDOTFILEDIR/work-zshenv"
+if [ -e "$HOME/.zshenv-work" ] ; then
+    source "$HOME/.zshenv-work"
 fi

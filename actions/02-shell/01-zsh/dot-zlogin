@@ -1,7 +1,7 @@
 ############################################################################
-# Just in case......
+# Basic Environment
 ############################################################################
 
-if [ -e "$WORKDOTFILEDIR/work-zlogin" ] ; then
-    source "$WORKDOTFILEDIR/work-zlogin"
-fi
+export LC_ALL=en_US.UTF-8
+
+export TERM="xterm-256color"

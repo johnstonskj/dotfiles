@@ -6,7 +6,7 @@ export PATH=/usr/local/opt/ruby/bin:$PATH
 #export CPPFLAGS="-I/usr/local/opt/ruby/include $CPPFLAGS"
 #export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+# Add RVM to PATH for scripting.
 export PATH="$PATH:$HOME/.rvm/bin"
 
 if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then

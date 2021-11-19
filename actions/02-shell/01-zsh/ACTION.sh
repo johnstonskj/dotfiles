@@ -20,7 +20,4 @@ if [[ $ACTION = (install|update|uninstall|link) ]] ; then
 	link_file dot-zshenv $HOME/.zshenv
 	link_file dot-zshrc $HOME/.zshrc
 	link_file dot-zlogin $HOME/.zlogin
-
-	#link_dot_file $CURR_ACTION/dot-zprofile $HOME/.zprofile
-	#link_dot_file $CURR_ACTION/dot-zlogout $HOME/.zlogout
 fi

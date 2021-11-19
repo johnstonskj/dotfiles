@@ -18,17 +18,15 @@ COMPLETION_WAITING_DOTS="true"
 plugins=(git github gnu-utils python pip tmux)
 
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
-  	plugins+=(osx)
+   plugins+=(macos)
   	brew_prefix=$(brew --prefix)
 
   	if type brew &>/dev/null; then
-	    FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
-   
-      	FPATH=$brew_prefix/share/zsh-completions:$FPATH
-   
-      	FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
-     	source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
-	fi
+	   FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
+	   FPATH=$brew_prefix/share/zsh-completions:$FPATH
+      FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
+      source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
+   fi
 fi
 
 ZSH_DISABLE_COMPFIX=true
@@ -60,8 +58,6 @@ alias llt='exa -lT --git --git-ignore --level=2 --group-directories-first'
 alias more=less
 alias myip='curl http://ipecho.net/plain; echo'
 alias sed=sd
-alias tmls='tmux ls'
-alias tma='tmux a'
 alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
 alias top=htop
 alias vi='vim'
@@ -69,16 +65,17 @@ alias weather='curl wttr.in'
 alias wtf='wtfutil'
 alias gh-token='bw get item Github | jq -r ".fields[0] .value"'
 
-# Docker image commands
-alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'
-alias docker-ubuntu='docker run -it ubuntu bash'
+############################################################################
+# Starship prompt
+############################################################################
+
+eval "$(starship init zsh)"
 
 ############################################################################
 # Just in case......
 ############################################################################
 
-if [ -e "$WORKDOTFILEDIR/work-zshrc" ] ; then
-    source "$WORKDOTFILEDIR/work-zshrc"
+if [ -e "$HOME/.zshrc-work" ] ; then
+    source "$HOME/.zshrc-work"
 fi
 
-eval "$(starship init zsh)"

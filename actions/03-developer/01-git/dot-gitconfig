@@ -1,7 +1,7 @@
 [user]
 	name = Simon Johnston
 	email = johnstonskj@gmail.com
-	signingkey = 49CC458D0281805F54A1B65A565B73DB6CC7F708
+	signingkey = 644CF77829C7C3BB5B868DC896A0664B9D482667
 
 [color]
 	ui = auto
@@ -37,3 +37,6 @@
 
 [tag]
     forceSignAnnotated = false
+
+[init]
+	defaultBranch = main

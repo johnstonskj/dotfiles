@@ -76,6 +76,14 @@ symbol = " "
 [rust]
 symbol = " "
 
+[custom.racket]
+description = "Racket"
+symbol = "𝝺 "
+style = "bold blue"
+extensions = ["rkt", "scrbl"]
+command = """racket --version | cut -d "v" -f 2 | cut -d " " -f 1"""
+format = "via [$symbol($output )]($style) "
+
 [custom.os-macos]
 description = "MacOS Version"
 symbol = " "

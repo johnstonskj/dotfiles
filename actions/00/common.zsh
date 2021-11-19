@@ -283,12 +283,14 @@ cmd_manage_actions() {
 
 cmd_update_self () {
 	log-info "Updating self"
-	if [[ -f $DOTFILEDIR ]] ; then
+	if [[ -d $DOTFILEDIR ]] ; then
+		log-debug "+ pulling latest common repo in $DOTFILEDIR"
 		pushd $DOTFILEDIR
 		run_command git pull --rebase
 		popd
 	fi
-	if [[ -f $WORKDOTFILEDIR ]] ; then
+	if [[ -d $WORKDOTFILEDIR ]] ; then
+		log-debug "+ pulling latest common repo in $WORKDOTFILEDIR"
 		pushd $WORKDOTFILEDIR
 		run_command git pull --rebase
 		popd

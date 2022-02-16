@@ -3,22 +3,31 @@
 	email = johnstonskj@gmail.com
 	signingkey = 644CF77829C7C3BB5B868DC896A0664B9D482667
 
-[color]
-	ui = auto
-
-[core]
-	pager = less -FMRiX
-	editor = emacs
-	autocrlf = input
-
-[push]
-	default = simple
-
 [alias]
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%ar%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
 
+[color]
+	ui = auto
+
+[commit]
+    gpgSign = true
+    template = ~/.config/git/message
+
+[core]
+	pager = bat
+	editor = emacs
+	autocrlf = input
+    excludesfile = ~/.config/git/ignore_global
+    hooksPath = ~/.config/git/hooks
+
 [credential]
 	helper = osxkeychain
+
+[diff]
+    colorMoved = zebra
+
+[fetch]
+    prune = true
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -29,14 +38,20 @@
 [gpg]
     program = /usr/local/bin/gpg
 
-[commit]
-    gpgSign = true
+[init]
+	defaultBranch = main
+
+[log]
+    abbrevCommit = true
+    abbrevCommit = true
+    decorate = false
 
 [mergetool]
     keepBackup = true
 
+[push]
+	default = simple
+    followTags = true
+
 [tag]
     forceSignAnnotated = false
-
-[init]
-	defaultBranch = main

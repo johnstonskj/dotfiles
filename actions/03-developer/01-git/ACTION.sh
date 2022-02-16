@@ -1,8 +1,12 @@
-install_package git git-lfs
-install_package_for linux git-hub
-install_package_for macos -app gitkraken
+install_package git git-lfs gh
 
 link_file dot-gitconfig $HOME/.gitconfig
-link_file dot-gitignore_global $HOME/.gitignore_global
+
+GIT_CONFIG=$LOCAL_CONFIG/git
+make_dir $GIT_CONFIG
+link_file ignore_global $GIT_CONFIG/ignore_global
+link_file message $GIT_CONFIG/message
+make_dir $GIT_CONFIG/hooks
+
 link_file git-tag-delete $LOCAL_BIN/git-tag-delete
 link_file git-tag-replace $LOCAL_BIN/git-tag-replace

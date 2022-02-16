@@ -64,6 +64,8 @@ alias vi='vim'
 alias weather='curl wttr.in'
 alias wtf='wtfutil'
 alias gh-token='bw get item Github | jq -r ".fields[0] .value"'
+alias calc='open /Applications/MathStudio.app'
+alias sloc=tokei
 
 ############################################################################
 # Starship prompt

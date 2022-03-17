@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE  plist  PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+ <dict>
+   <key>KeepAlive</key>
+   <true/>
+   <key>Label</key>
+   <string>homebrew.mxcl.emacs</string>
+   <key>ProgramArguments</key>
+   <array>
+     <string>/usr/local/bin/emacs</string>
+     <string>--fg-daemon</string>
+   </array>
+   <key>RunAtLoad</key>
+   <true/>
+   <key>EnvironmentVariables</key>
+   <dict>
+     <key>PATH</key>
+     <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/Applications/Racket v8.1/bin:/usr/local/MacGPG2/bin:/Users/simonjo/.toolbox/bin:/Users/simonjo/.cargo/bin:/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.3/bin:/Users/simonjo/anaconda/bin:/usr/local/anaconda3/bin:/usr/local/sbin:/Users/simonjo/bin:/Applications/Docker.app/Contents/Resources/bin:/Users/simonjo/local/gnat/2020/bin:/usr/local/MacGPG2/bin/:/usr/local/opt/llvm/bin:/Applications/Racket v8.3/bin:/Users/simonjo/Library/Racket/8.3/bin:/Users/simonjo/.rvm/bin</string>
+   </dict>
+ </dict>
+</plist>

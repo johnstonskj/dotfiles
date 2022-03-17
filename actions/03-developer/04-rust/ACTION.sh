@@ -25,6 +25,7 @@ if [[ $ACTION = update ]] ; then
 	rustup update
 fi
 
+install_package_for macos rust-analyzer
 install_package_for macos rustc-completion
 
 link_env_file rust

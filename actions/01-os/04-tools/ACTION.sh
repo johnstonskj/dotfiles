@@ -2,7 +2,7 @@ install_package glances htop lynx parallel jq
 install_package_for linux ethtool
 install_package_for macos coreutils gnu-sed
 install_package_for linux fd-find
-install_package_for macos fd
+install_package_for macos fd fzf telnet
 
 link_file credback $LOCAL_BIN/credback
 link_file ddcpimg $LOCAL_BIN/ddcpimg

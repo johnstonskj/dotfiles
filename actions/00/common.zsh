@@ -1,3 +1,5 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
 ############################################################################
 # Config stuff
 ############################################################################
@@ -117,20 +119,20 @@ parse_command_line() {
 		DOTFILEDIR=$WORKDOTFILEDIR;
 		ACTIONDIR=$WORKACTIONDIR;
 		shift;
-    parse_command_line $*;;
+        parse_command_line $*;;
 	-v)
     LOGLEVEL=3;
 		shift;
-    parse_command_line $*;;
+        parse_command_line $*;;
 	-V)
     LOGLEVEL=4;
 		shift;
-    parse_command_line $*;;
+        parse_command_line $*;;
 	*)
 	  log-error "Error: unknown command: $1."
 		ACTION=help;;
   esac
-  ACTION_ARGS=(${@:3:4})
+  ACTION_ARGS=(${@:2:4})
 }
 
 ############################################################################
@@ -226,7 +228,7 @@ cmd_manage_groups() {
 }
 
 cmd_manage_actions() {
-	echo $0
+	log-info "manage action $ACTION_ARGS"
 	case $ACTION_ARGS[1]
 	in
 	new)
@@ -244,7 +246,7 @@ cmd_manage_actions() {
 			else
 				make_dir "$group/$new_name"
 				if [[ ! -e "$group/$new_name/$ACTION_FILE" ]] ; then
-					echo "# Action file for $new_name" > "$group/$new_name/$ACTION_FILE"
+					echo "# -*- mode: sh; eval: (sh-set-shell \"zsh\") -*-\n# Action file for $new_name" > "$group/$new_name/$ACTION_FILE"
 				fi
 				$VISUAL "$group/$new_name/$ACTION_FILE"
 			fi

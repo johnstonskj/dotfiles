@@ -1,4 +1,4 @@
-install_package git git-lfs gh
+install_package git git-lfs gh act
 
 link_file dot-gitconfig $HOME/.gitconfig
 

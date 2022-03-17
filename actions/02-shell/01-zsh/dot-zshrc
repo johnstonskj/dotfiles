@@ -1,3 +1,5 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
 ############################################################################
 # Oh-My Zsh
 ############################################################################
@@ -24,8 +26,8 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
   	if type brew &>/dev/null; then
 	   FPATH=$brew_prefix/share/zsh/functions:$brew_prefix/share/zsh/site-functions:$FPATH
 	   FPATH=$brew_prefix/share/zsh-completions:$FPATH
-      FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
-      source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
+       # FPATH=$brew_prefix/share/zsh-navigation-tools:$FPATH
+       # source $brew_prefix/share/zsh-navigation-tools/zsh-navigation-tools.plugin.zsh
    fi
 fi
 
@@ -80,4 +82,7 @@ eval "$(starship init zsh)"
 if [ -e "$HOME/.zshrc-work" ] ; then
     source "$HOME/.zshrc-work"
 fi
+
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 

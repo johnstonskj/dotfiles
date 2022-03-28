@@ -16,19 +16,31 @@ install_package cask
 link_env_file emacs
 
 if [[ $ACTION = (install|update|link) ]] ; then
+
+    run_command git submodule init
+    run_command git submodule update
+
     make_dir $EMACS_CONF/lib
-	link_file init.el $EMACS_CONF/init.el
-    link_file init_zsh.sh $EMACS_CONF/init_zsh.sh
+	link_file emacs-init/init.el $EMACS_CONF/init.el
+    link_file emacs-init/init_zsh.sh $EMACS_CONF/init_zsh.sh
+
+    link_file emacs-init/lib/skj $EMACS_CONF/lib/skj
+    
     if [[ $OPSYS = macos ]] ; then
         link_file emacs-server.plist ~/Library/LaunchAgents/emacs-server.plist
         log-info "launchctl load -w ~/Library/LaunchAgents/emacs-server.plist"
     fi
+    
 elif [[ $ACTION = uninstall ]] ; then
+    
 	remove_file $EMACS_CONF/init.el
 	remove_file $EMACS_CONF/init_zsh.sh
+
+    remove_file $EMACS_CONF/lib/skj
+    
     if [[ $OPSYS = macos ]] ; then
         remove_file ~/Library/LaunchAgents/emacs-server.plist
     fi
 	remove_dir $EMACS_CONF
+    
 fi
-

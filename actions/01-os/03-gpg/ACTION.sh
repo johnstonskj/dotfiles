@@ -7,6 +7,8 @@ GPG_HOME=$HOME/.gnupg
 link_file gpg.conf $GPG_HOME/gpg.conf
 link_file gpg-agent-linux.conf $GPG_HOME/gpg-agent-$OPSYS.conf
 
+link_env_file gnupg
+
 if [[ $ACTION = install ]] ; then
 	if [ ! -d $GPG_HOME ] ; then
 	    log-info "++ GPG initialization..."

@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+if [[ $OSTYPE =~ $darwin.* ]] ; then
+    # Setup by homebrew
+    PATH=/usr/local/opt/gnu-getopt/bin:$PATH
+fi
+
+SHOW_CHANGES=0
+DEBUG=0
+TOP_DIR=$(pwd)
+
+DIR_IGNORE="build|compiled|doc|target|test|tests"
+GIT_REPO=".git"
+
+help () {
+    echo "Check Git status recursively"
+    echo
+    echo -e "\t$0 [-d][-s][-h] [dir||.]"
+    echo
+    echo -e "\t-s,--show-changes\tShow repo outstanding changes"
+    echo -e "\t-d,--debug\t\tEnable debug logging"
+    echo -e "\t-h,--help\t\tShow help"
+}
+
+parse_command_line () {
+    local SHORT=s,d,h
+    local LONG=show-changes,debug,help
+    local OPTS=$(getopt --options $SHORT --longoptions $LONG -- "$@")
+
+    eval set -- "$OPTS"
+    
+    while :
+    do
+        case "$1" in
+            -s | --show )
+                SHOW_CHANGES=1
+                shift
+                ;;
+            -d | --debug )
+                DEBUG=1
+                shift 
+                ;;
+            -h | --help)
+                help
+                exit 0
+                ;;
+            --)
+                shift;
+                break
+                ;;
+            *)
+                echo "Unexpected option: $1"
+                ;;
+        esac
+    done
+    if [[ $# -eq 1 ]] ; then
+        TOP_DIR=$1
+    elif [[ $# -gt 1 ]] ; then
+        echo "Error, too many arguments: $@"
+        help
+        exit 2
+    fi
+    decho "SHOW_CHANGES=$SHOW_CHANGES"
+    decho "DEBUG=$DEBUG"
+    decho "TOP_DIR=$TOP_DIR"
+}
+
+decho () {
+    local log_message="$@"
+    if [[ $DEBUG -ne 0 ]] ; then
+        echo "DEBUG $log_message"
+    fi
+}
+
+check_project () {
+    local project_path=$1
+
+    decho "checking $project_path"
+
+    if [[ -n $(git status -s) ]] ; then
+        local display="$project_path"
+        local origin=$(git config --get remote.origin.url)
+        if [[ "$origin" != "" ]] ; then
+            display="$display ($origin)"
+        fi
+        if [[ $SHOW_CHANGES -eq 0 ]] ; then
+            echo " U $display"
+            return 1
+        else
+            echo "$display:"
+            git status -s
+            return 1
+        fi
+    else
+        return 0
+    fi
+}
+
+check_projects_in () {
+    local root_dir=$1
+    local all_clean=0
+
+    decho "In $root_dir"
+
+    if [[ -d $GIT_REPO ]] ; then
+        decho "dir $root_dir is a project"
+        check_project $next
+        all_clean=$all_clean || $?
+    fi
+
+    for next in $root_dir/*
+    do
+        if [[ -d $next ]] ; then
+            if [[ $next =~ /($DIR_IGNORE)$ ]] ; then
+                decho "Ignoring $next"
+            else
+                decho "entering subdir $next"
+                pushd "$next" >/dev/null
+                check_projects_in $next
+                all_clean=$all_clean || $?
+                popd >/dev/null
+            fi
+        fi
+    done
+
+    return $all_clean
+}
+
+parse_command_line $@
+
+decho "starting in $TOP_DIR"
+check_projects_in $TOP_DIR
+
+exit $?

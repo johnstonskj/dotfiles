@@ -17,7 +17,9 @@ bottom
 du-dust
 eva
 exa
+flamegraph
 fselect
+hyperfine
 mdbook
 nu --all-features
 sd

@@ -1,0 +1,12 @@
+#/usr/bin/env zsh
+
+for dir in $@; do
+    if [[ -d $dir ]]; then
+        pushd $dir >/dev/null
+        if [[ -d .git ]]; then
+            echo ========== `pwd`
+            git status -s
+        fi
+        popd >/dev/null
+    fi
+done

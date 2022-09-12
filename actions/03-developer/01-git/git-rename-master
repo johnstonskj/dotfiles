@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ "$1" == "" ]] ; then
+    NEW=main
+else
+    NEW=$1
+fi
+
+if [[ "$2" == "" ]] ; then
+    OLD=master
+else
+    OLD=$2
+fi
+
+git branch -m $OLD $NEW
+git fetch origin
+git branch -u origin/$NEW $NEW
+git remote set-head origin -a

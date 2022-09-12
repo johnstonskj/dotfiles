@@ -8,9 +8,9 @@ export PAGER=less
 
 export VISUAL=emacs
 if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='vim'
+    export EDITOR="vim"
 else
-    export EDITOR='emacs'
+    export EDITOR="emacsclient -nw"
 fi
 
 ############################################################################

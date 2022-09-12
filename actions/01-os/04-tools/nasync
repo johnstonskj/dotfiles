@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+if [[ "$1" == "" ]] ; then
+    echo "Need to give me a dir name"
+    exit 1
+fi
+
+LOCAL=$1
+
+if [[ "${LOCAL:0:1}" == \~ ]] ; then
+    LOCAL=${LOCAL/#\~/$HOME}
+fi
+
+if [[ "${LOCAL:0:1}" == \. ]] ; then
+    LOCAL=${LOCAL/#\./$PWD}
+fi
+
+if [[ ! -d $LOCAL ]] ; then
+    echo "$DIR isn't a local dir"
+    exit 2
+fi
+
+if [[ ! -d "/Volumes/home" ]] ; then
+    echo "No NAS mount, connect and re-run script"
+    open "afp://simon@JOHNAS1%28AFP%29._afpovertcp._tcp.local/home"
+else
+    REMOTE=${LOCAL#"$HOME/"}
+    REMOTE="${REMOTE%/}"    
+    REMOTE=$(echo $REMOTE | tr '/' '-')
+    LOCAL="${LOCAL%/}/"
+
+    echo rsync -avzP $LOCAL /Volumes/home/Backup/$REMOTE
+fi

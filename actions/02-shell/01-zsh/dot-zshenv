@@ -51,10 +51,15 @@ export GPG_TTY=$(tty)
 export LOCAL_CONFIG=$HOME/.config
 
 for dir in $LOCAL_CONFIG/*; do
-  if [[ -d $dir && -f $dir/env ]] ; then
-    source $dir/env
-  fi
+    if [[ -d $dir && -f $dir/env ]] ; then
+        source $dir/env
+    fi
 done
+
+if [[ -d /opt/homebrew ]] ; then
+    BREW=/opt/homebrew
+    PATH=$BREW/bin:$PATH
+fi
 
 ############################################################################
 # Just in case......

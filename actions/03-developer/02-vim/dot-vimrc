@@ -139,11 +139,11 @@ if $COLORTERM == 'gnome-terminal'
     set t_Co=256
 endif
 
-try
-    set background=light
-    colorscheme solarized
-catch
-endtry
+" try
+"     set background=light
+"     colorscheme solarized
+" catch
+" endtry
 
 " Set extra options when running in GUI mode
 if has("gui_running")

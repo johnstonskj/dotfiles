@@ -1,5 +1,53 @@
 #!/usr/bin/env bash
 
+usage() {}
+
+parse_cmdline() {
+    _VERBOSE=0
+    _RESTORE=0
+    _DRYRUN=0
+
+    options=$(getopt -l "help,restore,dry-run,verbose" -o "hrnV" -- "$@")
+
+    eval set -- "$options"
+
+    while true
+    do
+        case "$1" in
+        -h|--help)
+            showHelp
+            exit 0
+            ;;
+        -r|--restore)
+            shift
+            export _RESTORE=1
+            ;;
+        -V|--verbose)
+            export _VERBOSE=1
+            set -xv  # Set xtrace and verbose mode.
+            ;;
+        -n|--dry-run)
+            export _DRYRUN=1
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+    shift
+done
+}
+
+NAS_VOLUME=/Volumes/home
+NAS_BACKUP_DIR=$NAS_VOLUME/Backup
+
+if [[ "$1" == "-r" || "$1" == "--restore" ]] ; then
+    shift
+    RESTORE=yes
+else
+    RESTORE=no
+fi
+
 if [[ "$1" == "" ]] ; then
     echo "Need to give me a dir name"
     exit 1
@@ -20,14 +68,22 @@ if [[ ! -d $LOCAL ]] ; then
     exit 2
 fi
 
-if [[ ! -d "/Volumes/home" ]] ; then
+if [[ ! -d $NAS_VOLUME ]] ; then
     echo "No NAS mount, connect and re-run script"
     open "afp://simon@JOHNAS1%28AFP%29._afpovertcp._tcp.local/home"
 else
+    FLAGS=--verbose --archive --compress --partial --progress
     REMOTE=${LOCAL#"$HOME/"}
     REMOTE="${REMOTE%/}"    
     REMOTE=$(echo $REMOTE | tr '/' '-')
+    REMOTE=$NAS_BACKUP_DIR/$REMOTE
     LOCAL="${LOCAL%/}/"
 
-    echo rsync -avzP $LOCAL /Volumes/home/Backup/$REMOTE
+    if [[ $RESTORE == "yes" ]]; then
+        echo restore $REMOTE to $LOCALe 
+        rsync $FLAGS $REMOTE $LOCAL
+    else
+        echo backup $LOCAL to $REMOTE 
+        rsync $FLAGS $LOCAL $REMOTE
+    fi
 fi

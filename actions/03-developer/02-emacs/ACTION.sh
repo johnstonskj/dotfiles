@@ -11,7 +11,7 @@ install_package_for linux emacs-nox elpa-racket-mode
 install_package_for macos emacs-plus
 install_Package_for macos -app font-linux-libertine
 
-install_package cask
+install_package aspell cask
 
 link_env_file emacs
 

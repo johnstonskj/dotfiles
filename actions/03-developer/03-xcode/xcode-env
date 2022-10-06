@@ -1,0 +1,1 @@
+PATH=$PATH:$(xcode-select -p)

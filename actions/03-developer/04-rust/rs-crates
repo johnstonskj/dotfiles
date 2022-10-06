@@ -25,4 +25,5 @@ nu --all-features
 ripgrep
 sd
 skim
+tokei
 xsv

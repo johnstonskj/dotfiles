@@ -1,3 +1,5 @@
+# OpenSSH included by default on Darwin
+
 if [[ $OSSYS = linux && $ACTION = (install|update|uninstall) ]] ; then
 	log-debug "+++ install openssh packages"
 	local SSHDCONF=/etc/ssh/sshd_config
@@ -11,3 +13,5 @@ if [[ $OSSYS = linux && $ACTION = (install|update|uninstall) ]] ; then
 	    run_command sudo service ssh restart
 	fi
 fi
+
+link_env_file openssh

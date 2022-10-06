@@ -1,51 +1,56 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
-
+,
 ############################################################################
 # Basic Environment
 ############################################################################
 
 export PAGER=less
+alias more=less
 
-export VISUAL=emacs
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="vim"
 else
     export EDITOR="emacsclient -nw"
 fi
 
+export VISUAL=emacs
+
 ############################################################################
 # Setup the dotfiles directory
 ############################################################################
 
-if [ -d "$HOME/dotfiles" ] ; then
+if [[ -z "$DOTFILEDIR" && -d "$HOME/dotfiles" ]] ; then
     export DOTFILEDIR=$HOME/dotfiles
 fi
 
 ############################################################################
-# Prompt/Path/Environment customizations
+# Top-level paths
 ############################################################################
 
 if [ -d "$HOME/bin" ] ; then
     PATH=$HOME/bin:$PATH
 fi
 
-if [ -d "/usr/local" ] ; then
-    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/sbin:$PATH
+if [ -d "/usr/local/bin" ] ; then
+    PATH=/usr/local/bin:$PATH
+fi
+
+if [ -d "/usr/local/sbin" ] ; then
+    PATH=/usr/local/sbin:$PATH
+fi
+
+if [ -d "/usr/local/man" ] ; then
     export MANPATH=/usr/local/man:$MANPATH
 fi
 
-export ARCHFLAGS="-arch x86_64"
-
 ############################################################################
-# Security
+# And this magic
 ############################################################################
 
-export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-export GPG_TTY=$(tty)
+export ARCHFLAGS="-arch $(uname -m)"
 
 ############################################################################
-# Package-specific customizations
+# Package-specific paths
 ############################################################################
 
 export LOCAL_CONFIG=$HOME/.config
@@ -55,11 +60,6 @@ for dir in $LOCAL_CONFIG/*; do
         source $dir/env
     fi
 done
-
-if [[ -d /opt/homebrew ]] ; then
-    BREW=/opt/homebrew
-    PATH=$BREW/bin:$PATH
-fi
 
 ############################################################################
 # Just in case......

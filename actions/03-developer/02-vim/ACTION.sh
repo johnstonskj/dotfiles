@@ -9,3 +9,5 @@ link_file solarized.vim $VIM_HOME/colors/solarized.vim
 
 run_command curl -fLo $VIM_HOME/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+link_env_file vim

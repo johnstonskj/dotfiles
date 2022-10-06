@@ -1,1 +1,1 @@
-export PATH=$PATH:/usr/local/MacGPG2/bin/
+export GPG_TTY=$(tty)

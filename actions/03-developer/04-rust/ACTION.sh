@@ -30,6 +30,8 @@ install_package_for macos rustc-completion
 
 link_env_file rust
 
+link_env_file rtools
+
 link_file cargo-publish $LOCAL_BIN/cargo-publish
 link_file cargo-verify $LOCAL_BIN/cargo-verify
 link_file rust-update $LOCAL_BIN/rust-update

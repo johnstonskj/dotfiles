@@ -4,14 +4,14 @@ EMACS_CONF=$HOME/.emacs.d
 
 if [[ $OPSYS = macos && $ACTION = install ]] ; then
     run_command brew tap d12frosted/emacs-plus
+    run_command brew install emacs-plus --with-dbus
+    run_command ln -s /opt/homebrew/opt/emacs-plus@28/Emacs.app /Applications
+
+    run_command brew install cask --ignore-dependencies
 fi
 
 install_package_for linux emacs-nox elpa-racket-mode
-
-install_package_for macos emacs-plus
-install_Package_for macos -app font-linux-libertine
-
-install_package aspell cask cmake
+install_package aspell cmake
 
 link_env_file emacs
 

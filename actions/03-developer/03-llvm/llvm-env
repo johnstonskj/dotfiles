@@ -1,17 +1,18 @@
-# llvm is keg-only, which means it was not symlinked into /opt/homebrew,
-# because macOS already provides this software and installing another version in
-# parallel can cause all kinds of trouble.
-
-LLVM=$(brew --prefix)/opt/llvm
-
-# To use the bundled libc++ please add the following LDFLAGS:
-LDFLAGS="-L$LLVM/lib/c++ -Wl,-rpath,$LLVM/lib/c++"
-
-# If you need to have llvm first in your PATH, run:
-
-PATH=$LLVM/bin:$PATH
-
-# For compilers to find llvm you may need to set:
-export LDFLAGS="-L$LLVM/lib"
-export CPPFLAGS="-I$LLVM/include"
-
+if [[ -n $BREW ]] ; then
+    # llvm is keg-only, which means it was not symlinked into /opt/homebrew,
+    # because macOS already provides this software and installing another version in
+    # parallel can cause all kinds of trouble.
+    
+    LLVM=$BREW/opt/llvm
+    
+    # To use the bundled libc++ please add the following LDFLAGS:
+    LDFLAGS="-L$LLVM/lib/c++ -Wl,-rpath,$LLVM/lib/c++"
+    
+    # If you need to have llvm first in your PATH, run:
+    
+    PATH=$LLVM/bin:$PATH
+    
+    # For compilers to find llvm you may need to set:
+    export LDFLAGS="-L$LLVM/lib"
+    export CPPFLAGS="-I$LLVM/include"
+fi

@@ -1,1 +1,3 @@
-PATH=$PATH:$(xcode-select -p)
+if [[ $OSTYPE == darwin* ]] ; then
+    PATH=$PATH:$(xcode-select -p)
+fi

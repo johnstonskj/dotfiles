@@ -1,15 +1,22 @@
-export RUBY_VERSION=2.6.3
-export PATH=/usr/local/lib/ruby/gems/$RUBY_VERSION/bin:$PATH
-export PATH=/usr/local/opt/ruby/bin:$PATH
-
-#export LDFLAGS="-L/usr/local/opt/ruby/lib $LDFLAGS"
-#export CPPFLAGS="-I/usr/local/opt/ruby/include $CPPFLAGS"
-#export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-
-# Add RVM to PATH for scripting.
-export PATH="$PATH:$HOME/.rvm/bin"
-
-if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
-    # Load RVM into a shell session *as a function*
-    source "$HOME/.rvm/scripts/rvm" 
+if [[ -n $BREW ]] ; then
+    # ruby is keg-only, which means it was not symlinked into /opt/homebrew,
+    # because macOS already provides this software and installing another version in
+    # parallel can cause all kinds of trouble.
+    
+    RUBY=$BREW/opt/ruby
+    
+    PATH=$RUBY/bin:$BREW/lib/ruby/gems/3.1.0/bin:$PATH
+    
+    export LDFLAGS="-L$RUBY/lib $LDFLAGS"
+    export CPPFLAGS="-I$RUBY/include $CPPFLAGS"
+    
+    export PKG_CONFIG_PATH="$RUBY/lib/pkgconfig"
+    
+    # Add RVM to PATH for scripting.
+    export PATH="$PATH:$HOME/.rvm/bin"
+    
+    if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
+        # Load RVM into a shell session *as a function*
+        source "$HOME/.rvm/scripts/rvm" 
+    fi
 fi

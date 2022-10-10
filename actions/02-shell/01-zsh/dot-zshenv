@@ -55,8 +55,13 @@ export ARCHFLAGS="-arch $(uname -m)"
 
 export LOCAL_CONFIG=$HOME/.config
 
+# Ensure this is first to set the BREW variable
+if [[ -f $LOCAL_CONFIG/brew/env ]] ; then
+    source $LOCAL_CONFIG/brew/env
+fi 
+
 for dir in $LOCAL_CONFIG/*; do
-    if [[ -d $dir && -f $dir/env ]] ; then
+    if [[ $dir != */brew && -d $dir && -f $dir/env ]] ; then
         source $dir/env
     fi
 done

@@ -1,28 +1,25 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 
 ############################################################################
-# Flags
+# Oh-My Zsh
 ############################################################################
+
+export ZSH="$HOME/.oh-my-zsh"
+
+# ########## Flags
 
 ENABLE_CORRECTION="true"
+
 COMPLETION_WAITING_DOTS="true"
-ZSH_DISABLE_COMPFIX=true
 
-############################################################################
-# Plugin and other customization
-############################################################################
+# ########## Plugins
 
-plugins=(git github gnu-utils python pip)
+plugins=(git github gnu-utils rust)
 
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     plugins+=(macos)
 fi
 
-############################################################################
-# Oh-My Zsh
-############################################################################
-
-export ZSH="$HOME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
 
 ############################################################################

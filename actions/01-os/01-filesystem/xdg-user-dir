@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] ; then
+    source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+fi
+
+eval echo \${XDG_${1}_DIR:-$HOME}
+

@@ -15,7 +15,7 @@ GIT_REPO=".git"
 help () {
     echo "Check Git status recursively"
     echo
-    echo -e "\t$0 [-d][-s][-h] [dir||.]"
+    echo -e "\tUsage:$0 [-d][-s][-h] [dir||.]"
     echo
     echo -e "\t-s,--show-changes\tShow repo outstanding changes"
     echo -e "\t-d,--debug\t\tEnable debug logging"
@@ -25,7 +25,7 @@ help () {
 parse_command_line () {
     local SHORT=s,d,h
     local LONG=show-changes,debug,help
-    local OPTS=$(getopt --options $SHORT --longoptions $LONG -- "$@")
+    local OPTS=$(getopt -o $SHORT -l $LONG -- "$@")
 
     eval set -- "$OPTS"
     

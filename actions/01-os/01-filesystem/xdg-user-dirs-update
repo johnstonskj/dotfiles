@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+
+usage() {
+    echo "Update XDG user dir configuration"
+    echo
+    echo "    Usage: $(basename $0) [OPTION...] [--set NAME PATH...]"
+    echo
+    echo "    --help      Print help output and exit."
+    echo "    --force     Update existing user-dirs.dir, but force a full reset."
+    echo "    --dummy-output PATH"
+    echo "            Write the configuration to PATH instead of the default configuration file."
+    echo "    --set NAME PATH"
+    echo "            Sets the XDG user dir with the given name."
+}
+
+OPT_FORCE=1
+OPT_OUTPUT=
+OPT_SET=
+OPT_SET_PATH=
+OPT_MKDIR=0
+
+get_opts() {
+    local options=$(getopt --options h,f,d:,s: --longoptions help,force,dummy-output:,set: -- "$@")
+
+    eval set -- "$options"
+
+    while true
+    do
+        case "$1" in
+        --help)
+            usage
+            exit 1
+            ;;
+        --force)
+            OPT_FORCE=0
+            ;;
+        --dummy-output)
+            OPT_OUTPUT=$2
+            OPT_MKDIR=1
+            shift
+            ;;
+        --set)
+            OPT_SET=$2
+            if [[ ! "$OPT_SET" =~ ^(DESKTOP|DOWNLOAD|TEMPLATES|PUBLICSHARE|DOCUMENTS|MUSIC|PICTURES|VIDEOS)$ ]] ; then
+                echo "Error: invalid NAME ($OPT_SET)"
+                exit 2
+            fi
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        esac
+        shift
+    done
+    if [[ -n "$OPT_SET" ]] ; then
+        OPT_SET_PATH=$1
+        if [[ ! -d $OPT_SET_PATH ]] ; then
+            echo "Error: directory does not exist ($OPT_SET_PATH)"
+            exit 3
+        fi
+    fi
+}
+
+set_env_var() {
+    local var_name=$1
+    local path=$2
+    local output=$3
+
+    if [[ $path = "/"* ]] ; then
+        echo "XDG_${var_name}_HOME=\"$path\"" >> $output
+    else
+        echo "XDG_${var_name}_HOME=\"\$HOME/$path\"" >> $output
+    fi
+    if [[ ! -d $path && $OPT_MKDIR ]] ; then
+        mkdir $path
+    fi
+}
+
+set_env_path_var() {
+    local var_name=$1
+    shift
+    local var_path=
+    local output=$1
+    shift
+
+    for path in $@
+    do
+        if [[ -d $path ]] ; then
+            if [[ -z "$var_path" ]]; then
+                var_path=$path
+            else
+                var_path=$path:$var_path
+            fi
+        fi
+    done
+    echo "XDG_${var_name}_DIRS=\"$var_path\"" >> $output
+}
+
+write_base_dirs() {
+    if [[ -n "$XDG_CONFIG_HOME" ]] ; then
+        local OUTPUT_FILE="$XDG_CONFIG_HOME/base-dirs.dirs"
+    else
+        local OUTPUT_FILE="$HOME/.config/base-dirs.dirs"
+    fi
+
+    if [[ ! -f $OUTPUT_FILE ]] ; then
+        echo "# This file was created by $(basename $0)" > $OUTPUT_FILE || exit 4
+        set_env_var CONFIG ".config" $OUTPUT_FILE
+        set_env_var CACHE ".cache" $OUTPUT_FILE
+        set_env_var DATA ".local/share" $OUTPUT_FILE
+        set_env_var STATE ".local/state" $OUTPUT_FILE
+        set_env_var RUNTIME "/var/run/$USER" $OUTPUT_FILE
+        
+        set_env_path_var DATA $OUTPUT_FILE /usr/share /usr/local/share "$(brew --prefix)/share"
+        
+        set_env_path_var CONFIG $OUTPUT_FILE $XDG_ROOT
+    fi
+
+    source $OUTPUT_FILE
+}
+
+write_user_dirs() {
+    if [[ -n "$OPT_OUTPUT" ]] ; then
+        OUTPUT_FILE=$OPT_OUTPUT
+    else
+        OUTPUT_FILE=$XDG_CONFIG_HOME/user-dirs.dirs
+    fi
+    
+    if [[ ! -f $OUTPUT_FILE || -f $OUTPUT_FILE && $OPT_FORCE ]] ; then
+        echo "# This file was created by $(basename $0)" > $OUTPUT_FILE || exit 4
+        while read line ;
+        do
+            if [[ ${line//[[:space:]]/} =~ ^#.* || -z "$line" ]] ; then
+                continue
+            else
+                key=${line%=*}
+                dir=${line#*=}
+                if [[ "$key" == "$OPT_SET" ]] ; then
+                    echo "XDG_${key}_DIR=\"\$OPT_SET_DIR\"" >> $OUTPUT_FILE
+                else
+                    echo "XDG_${key}_DIR=\"\$HOME/$dir\"" >> $OUTPUT_FILE
+                fi
+            fi
+        done < "$XDG_ROOT/user-dirs.defaults"
+    elif [[ -f $OUTPUT_FILE && $OPT_FORCE -eq 1 ]] ; then
+        echo "Error: output file exists, try using --force"
+    fi
+}
+
+get_opts $@
+
+if [[ "$OSTYPE" == "darwin"* ]] ; then
+    XDG_ROOT=/opt/xdg
+else
+    XDG_ROOT=/etc/xdg
+fi
+
+write_base_dirs
+
+write_user_dirs
+
+

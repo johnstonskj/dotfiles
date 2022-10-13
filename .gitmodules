@@ -1,3 +1,6 @@
 [submodule "actions/03-developer/02-emacs/emacs-init"]
 	path = actions/03-developer/02-emacs/emacs-init
 	url = https://github.com/johnstonskj/emacs-init.git
+[submodule "actions/01-os/01-filesystem/xdg-user-dirs"]
+	path = actions/01-os/01-filesystem/xdg-user-dirs
+	url = https://gitlab.freedesktop.org/xdg/xdg-user-dirs

@@ -1,59 +1,84 @@
 #!/usr/bin/env bash
 
-usage() {}
+usage() {
+    echo "Backup/Restore to home NAS"
+    echo
+    echo "    Usage: $(basename $0) [OPTIONS] FOLDER"
+    echo
+    echo "    -h | --help        Show this help."
+    echo "    -r | --restore     Restore instead of backup."
+    echo "    -u | --user        Override default NAS user [$OPT_NAS_USER]."
+    echo "    -n | --host-name   Override default NAS userhost name [$OPT_NAS_HOST]."
+    echo "    -m | --mount-name  Override default NAS volume name [$OPT_NAS_VOLUME_NAME]."
+    echo "    -b | --backup-dir  Override default NAS backup dir [$OPT_NAS_BACKUP_DIR]."
+    echo "    -d | --dry-run     Do not perform actual copy actions."
+}
+
+OPT_VERBOSE=0
+OPT_RESTORE=0
+OPT_DRYRUN=0
+OPT_NAS_USER=simon
+OPT_NAS_HOST=JOHNAS1
+OPT_NAS_VOLUME_NAME=home
+OPT_NAS_BACKUP_DIR=Backup
+
+LOCAL_DIR=
 
 parse_cmdline() {
-    _VERBOSE=0
-    _RESTORE=0
-    _DRYRUN=0
-
-    options=$(getopt -l "help,restore,dry-run,verbose" -o "hrnV" -- "$@")
+    local options=$(getopt -o r,u:,n:,m:,b:,d,V,h -l restore,user:,mount-name:mount-path:,backup-dir:,dry-run,verbose,help -- "$@")
 
     eval set -- "$options"
 
     while true
     do
         case "$1" in
-        -h|--help)
-            showHelp
+        -h | --help)
+            usage
             exit 0
             ;;
-        -r|--restore)
+        -r | --restore)
             shift
-            export _RESTORE=1
+            export OPT_RESTORE=1
             ;;
-        -V|--verbose)
-            export _VERBOSE=1
+        -u | --user)
+            OPT_NAS_USER=$2
+            shift
+            ;;
+        -n | --host-name)
+            OPT_NAS_HOST=$2
+            shift
+            ;;
+        -m | --mount-name)
+            OPT_NAS_VOLUME_NAME=$2
+            shift
+            ;;
+        -b | --backup-dir)
+            export OPT_NAS_BACKUP_DIR=$2
+            shift
+            ;;
+        -V | --verbose)
+            export OPT_VERBOSE=1
             set -xv  # Set xtrace and verbose mode.
             ;;
-        -n|--dry-run)
-            export _DRYRUN=1
+        -d | --dry-run)
+            export OPT_DRYRUN=1
             ;;
         --)
             shift
             break
             ;;
-    esac
-    shift
-done
+        esac
+        shift
+    done
+    if [[ -z "$1" ]] ; then
+        echo "Need to give me a dir name"
+        exit 1
+    else
+        export LOCAL=$1
+    fi
 }
 
-NAS_VOLUME=/Volumes/home
-NAS_BACKUP_DIR=$NAS_VOLUME/Backup
-
-if [[ "$1" == "-r" || "$1" == "--restore" ]] ; then
-    shift
-    RESTORE=yes
-else
-    RESTORE=no
-fi
-
-if [[ "$1" == "" ]] ; then
-    echo "Need to give me a dir name"
-    exit 1
-fi
-
-LOCAL=$1
+parse_cmdline $@
 
 if [[ "${LOCAL:0:1}" == \~ ]] ; then
     LOCAL=${LOCAL/#\~/$HOME}
@@ -68,22 +93,35 @@ if [[ ! -d $LOCAL ]] ; then
     exit 2
 fi
 
+NAS_VOLUME=/Volumes/$OPT_NAS_VOLUME_NAME
+NAS_BACKUP_DIR=$NAS_VOLUME/$OPT_NAS_BACKUP_DIR
+
 if [[ ! -d $NAS_VOLUME ]] ; then
     echo "No NAS mount, connect and re-run script"
-    open "afp://simon@JOHNAS1%28AFP%29._afpovertcp._tcp.local/home"
-else
-    FLAGS=--verbose --archive --compress --partial --progress
-    REMOTE=${LOCAL#"$HOME/"}
-    REMOTE="${REMOTE%/}"    
-    REMOTE=$(echo $REMOTE | tr '/' '-')
-    REMOTE=$NAS_BACKUP_DIR/$REMOTE
-    LOCAL="${LOCAL%/}/"
-
-    if [[ $RESTORE == "yes" ]]; then
-        echo restore $REMOTE to $LOCALe 
-        rsync $FLAGS $REMOTE $LOCAL
+    if [[ $OPT_DRYRUN -eq 1 ]] ; then
+        echo mount "afp://${OPT_NAS_USER}@${OPT_NAS_HOST}%28AFP%29._afpovertcp._tcp.local/$OPT_NAS_VOLUME_NAME" at $NAS_VOLUME
     else
-        echo backup $LOCAL to $REMOTE 
-        rsync $FLAGS $LOCAL $REMOTE
+        open "afp://${OPT_NAS_USER}@${OPT_NAS_HOST}%28AFP%29._afpovertcp._tcp.local/$OPT_NAS_VOLUME_NAME"
+        exit 0
     fi
+fi
+
+FLAGS="--verbose --archive --compress --partial --progress"
+if [[ $OPT_DRYRUN -eq 1 ]] ; then
+    FLAGS="$FLAGS --dry-run"
+fi
+
+REMOTE=${LOCAL#"$HOME/"}
+REMOTE="${REMOTE%/}"    
+REMOTE=$(echo $REMOTE | tr '/' '-')
+REMOTE=$NAS_BACKUP_DIR/$REMOTE
+
+LOCAL="${LOCAL%/}/"
+
+if [[ $RESTORE == "yes" ]]; then
+    echo "restore $REMOTE to $LOCAL ($FLAGS)"
+    rsync $FLAGS $REMOTE $LOCAL
+else
+    echo "backup $REMOTE to $LOCAL ($FLAGS)"
+    rsync $FLAGS $LOCAL $REMOTE
 fi

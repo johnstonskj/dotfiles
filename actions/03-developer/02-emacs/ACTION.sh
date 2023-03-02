@@ -25,7 +25,8 @@ if [[ $ACTION = (install|update|link) ]] ; then
 	link_file emacs-init/custom.el $EMACS_CONF/custom.el
     link_file emacs-init/init_zsh.sh $EMACS_CONF/init_zsh.sh
 
-    link_file emacs-init/lib/skj $EMACS_CONF/lib/skj
+    link_file emacs-init/lib $EMACS_CONF/lib
+    link_file emacs-init/org-init $EMACS_CONF/org-init
 
     if [[ $OPSYS = macos ]] ; then
         link_file emacs-server.plist ~/Library/LaunchAgents/emacs-server.plist
@@ -37,7 +38,8 @@ elif [[ $ACTION = uninstall ]] ; then
 	remove_file $EMACS_CONF/init.el
 	remove_file $EMACS_CONF/init_zsh.sh
 
-    remove_file $EMACS_CONF/lib/skj
+    remove_file $EMACS_CONF/lib
+    remove_file $EMACS_CONF/org-init
 
     if [[ $OPSYS = macos ]] ; then
         remove_file ~/Library/LaunchAgents/emacs-server.plist

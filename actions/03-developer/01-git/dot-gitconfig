@@ -15,7 +15,7 @@
 
 [core]
 	pager = bat
-	editor = emacs
+	editor = emacsclient -nw
 	autocrlf = input
     excludesfile = ~/.config/git/ignore_global
     hooksPath = ~/.config/git/hooks
@@ -36,7 +36,7 @@
 	process = git-lfs filter-process
 
 [gpg]
-    program = /opt/homebrew/bin/gpg
+    program = /usr/local/bin/gpg
 
 [init]
 	defaultBranch = main

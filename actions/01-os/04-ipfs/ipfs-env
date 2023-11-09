@@ -1,2 +1,8 @@
-export IPFS_HOME=$HOME/.ipfs
-alias ipfsui='open http://localhost:5001/webui'
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+############################################################################
+# The InterPlanetary File System
+############################################################################
+
+if package_installed ipfs; then
+    export IPFS_HOME=$HOME/.ipfs
+fi

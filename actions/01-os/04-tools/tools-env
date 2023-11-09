@@ -1,8 +1,10 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# Assorted tools
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+    SED=gsed
+else
+    SED=sed
 fi

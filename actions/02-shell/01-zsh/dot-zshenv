@@ -1,8 +1,56 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 
 ############################################################################
+#
+# Zsh startup file sequence:
+#
+# 1. `.zshenv` -- is sourced on all invocations of the shell, unless the
+#    `-f` option is set. It should contain commands to set the command
+#    search path, plus other important environment variables. `.zshenv`
+#    shouldnot contain commands that produce output or assume the shell is
+#    attached to a tty.
+# 2. `.zprofile` -- is similar to `.zlogin`, except that it is sourced
+#    before `.zshrc`. `.zprofile` is meant as an alternative to `.zlogin`
+#    for ksh fans; the two are not intended to be used together, although
+#    this could certainly be done if desired.
+# 3. `.zshrc` -- is sourced in **interactive** shells. It should contain
+#    commands to set up aliases, functions, options, key bindings, etc.
+# 4. `.zlogin` -- is sourced in login shells. It should contain commands
+#    that should be executed only in login shells. `.zlogin` is not the
+#    place for alias definitions, options, environment variable settings,
+#    etc.; as a general rule, it should not change the shell environment at
+#    all. Rather, it should be used to set the terminal type and run a
+#    series of external commands (`fortune`, `msgs`, etc).
+# 5. `.zlogout` -- is sourced when login shells exit.
+#
+############################################################################
+
+if ! typeset -f log_critical >/dev/null; then
+    SHLOG_SOURCE="${XDG_DATA_HOME:-$HOME/.local/share/shlog}/shlog.sh"
+    if [[ -f ${SHLOG_SOURCE} ]]; then
+        source ${SHLOG_SOURCE}
+    else
+        echo "Error: logging script ${SHLOG_SOURCE} not found."
+    fi
+fi
+
+log_info "Starting Zsh initialization"
+
+log_debug "os-name: $(uname -s | tr '[:upper:]' '[:lower:]')"
+log_debug "os-version: $(uname -r)"
+log_debug "host-name: $(hostname)"
+log_debug "host-arch: $(uname -m)"
+log_debug "user-id: $(whoami)"
+log_debug "user-home: $HOME"
+log_debug "shell-version: ${ZSH_VERSION}"
+
+log_scope_enter "zshenv"
+
+############################################################################
 # Basic Environment
 ############################################################################
+
+log_scope_enter "env-basics"
 
 export PAGER=less
 alias more=less
@@ -15,56 +63,110 @@ fi
 
 export VISUAL=emacs
 
-############################################################################
-# Setup the dotfiles directory
-############################################################################
-
 if [[ -z "$DOTFILEDIR" && -d "$HOME/dotfiles" ]] ; then
     export DOTFILEDIR=$HOME/dotfiles
 fi
+
+export ARCHFLAGS="-arch $(uname -m)"
+
+log_scope_exit "env-basics"
 
 ############################################################################
 # Top-level paths
 ############################################################################
 
-if [ -d "$HOME/bin" ] ; then
-    PATH=$HOME/bin:$PATH
-fi
+log_scope_enter "env-paths"
 
-if [ -d "/usr/local/bin" ] ; then
-    PATH=/usr/local/bin:$PATH
-fi
+local ADD_TO_PATH=(
+    "$HOME/bin"
+    "$HOME/.local/bin"
+    "/usr/local/bin"
+    "/usr/local/sbin"
+)
 
-if [ -d "/usr/local/sbin" ] ; then
-    PATH=/usr/local/sbin:$PATH
-fi
+for __path in $ADD_TO_PATH; do
+    if [[ -d "${__path}" ]] ; then
+        export PATH="${__path}:${PATH}"
+    fi
+done
+
+log_debug "PATH=${PATH}"
 
 if [ -d "/usr/local/man" ] ; then
     export MANPATH=/usr/local/man:$MANPATH
 fi
+log_debug "MANPATH=${MANPATH}"
+
+log_scope_exit "env-paths"
 
 ############################################################################
-# And this magic
+# Configure XDG directories
 ############################################################################
 
-export ARCHFLAGS="-arch $(uname -m)"
+log_scope_enter "env-xdg"
+
+if ! xdg-user-dirs-update; then
+    log_error "No 'xdg-user-dirs-update' command found"
+fi
+
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+
+if [[ -f ${XDG_CONFIG_HOME}/base-dirs.dirs ]]; then
+    source ${XDG_CONFIG_HOME}/base-dirs.dirs
+else
+    log_error "No XDG 'base-dirs' file found, expecting ${XDG_CONFIG_HOME}/base-dirs.dirs"
+fi
+
+if [[ -f ${XDG_CONFIG_HOME}/user-dirs.dirs ]]; then
+    source ${XDG_CONFIG_HOME}/user-dirs.dirs
+else
+    log_error "No XDG 'user-dirs' file found, expecting ${XDG_CONFIG_HOME}/user-dirs.dirs"
+fi
+
+log_scope_exit "env-xdg"
 
 ############################################################################
-# Package-specific paths
+# Package-manager directories and commands
 ############################################################################
 
-export LOCAL_CONFIG=$HOME/.config
+log_scope_enter "package-managers"
 
-# Ensure this is first to set the BREW variable
-if [[ -f $LOCAL_CONFIG/brew/env ]] ; then
-    source $LOCAL_CONFIG/brew/env
-fi 
+export HOMEBREW_CMD=/opt/homebrew/bin/brew
+if [[ -x ${HOMEBREW_CMD} ]]; then
+    eval $(${HOMEBREW_CMD} shellenv)
+else
+    log_error "homebrew not installed"
+fi
 
-for dir in $LOCAL_CONFIG/*; do
-    if [[ $dir != */brew && -d $dir && -f $dir/env ]] ; then
-        source $dir/env
+export CARGO_CMD=${HOME}/.cargo/bin/cargo
+if [[ -x ${CARGO_CMD} ]]; then
+    export PATH=${HOME}/.cargo/bin:${PATH}
+else
+    log_error "cargo not installed"
+fi
+
+# Ensure this is next, useful functions for environment checking
+if [[ -f $XDG_CONFIG_HOME/mcfg ]] ; then
+    source $XDG_CONFIG_HOME/mcfg
+fi
+
+log_scope_exit "package-managers"
+
+############################################################################
+# Package-specific configuration files
+############################################################################
+
+log_scope_enter "package-env"
+
+for dir in $XDG_CONFIG_HOME/*; do
+    if [[ -f "${dir}/env" ]] ; then
+        log_scope_enter "$(basename ${dir})"
+        source "${dir}/env"
+        log_scope_exit "$(basename ${dir})"
     fi
 done
+
+log_scope_exit "package-env"
 
 ############################################################################
 # Just in case......
@@ -73,3 +175,5 @@ done
 if [ -e "$HOME/.zshenv-work" ] ; then
     source "$HOME/.zshenv-work"
 fi
+
+log_scope_exit "zshenv"

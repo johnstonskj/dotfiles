@@ -1,15 +1,12 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 
-export LC_ALL=en_US.UTF-8
+log_scope_enter "zlogin"
 
+############################################################################
+# Required for login shells
+############################################################################
+
+export LC_ALL=en_US.UTF-8
 export TERM="xterm-256color"
 
-xdg-user-dirs-update
-
-if [[ -f ${XDG_CONFIG_HOME:-~/.config}/base-dirs.dirs ]]; then
-    source ${XDG_CONFIG_HOME:-~/.config}/base-dirs.dirs
-fi
-
-if [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]]; then
-    source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
-fi
+log_scope_exit "zlogin"

@@ -1,32 +1,27 @@
-# Summarize changes in around 50 characters or less
+type(scope): Summary
+# <type>(<scope>)(!): <short summary>
+#   │       │     │       │
+#   │       │     │       └─⫸ Summary in present tense.
+#   │       │     │           Not capitalized.
+#   │       │     │           No period at the end.
+#   │       │     │           Use the imperative, present tense.
+#   │       │     │
+#   │       │     └─⫸ Breaking change flag.
+#   │       │
+#   │       └─⫸ Commit Scope: project-dependent
+#   │
+#   └─⫸ Commit Type: feat|fix
+#                  | build|chore|docs|ops|perf|refactor|style|test
+#----------------------------------MAX LENGTH (52)  ^
 
-# More detailed explanatory text, if necessary. Wrap it to about 72
-# characters or so. In some contexts, the first line is treated as the
-# subject of the commit and the rest of the text as the body. The
-# blank line separating the summary from the body is critical (unless
-# you omit the body entirely); various tools like `log`, `shortlog`
-# and `rebase` can get confused if you run the two together.
+# Body text is simple paragraphs, which may include (but if used, should
+# start with) a keyword such as [Add] etc. Use the imperative, present
+# tense: "change" not "changed" nor "changes"
+#------------------------------------------------------MAX LENGTH (72)  ^
 
-# Explain the problem that this commit is solving. Focus on why you
-# are making this change as opposed to how (the code explains that).
-# Are there side effects or other unintuitive consequences of this
-# change? Here's the place to explain them.
-
-# Further paragraphs come after blank lines.
-# 
-#  - Bullet points are okay, too
-# 
-#  - Typically a hyphen or asterisk is used for the bullet, preceded
-#    by a single space, with blank lines in between, but conventions
-#    vary here
-
-# If you use an issue tracker, put references to them at the bottom,
-# like this:
-# 
-# Resolves: #123
-# See also: #456, #789
-
-# At the end: Include Co-authored-by for all contributors.
-# Include at least one empty line before it. Format:
-# Co-authored-by: name <user@users.noreply.github.com>
-
+# Add Footers for additional information
+# - BREAKING-CHANGE
+# - About people: Signed-off-by, Reviewed-by, Co-authored-by
+# - About commits: Amend, Ref, Revert, See-Also
+# - About issues: Fix, Resolve, Close, See-Also
+# - More information: Specification, See-Also

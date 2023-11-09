@@ -1,7 +1,13 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+############################################################################
+# Python3
+############################################################################
+
 export PYTHON_VERSION=$(python3 --version |cut -d " " -f2)
+
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     export PATH=/usr/local/anaconda3/bin:$PATH
-    __conda_setup="$('/Users/$(whoami)/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    local __conda_setup="$('/Users/$(whoami)/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
     if [ $? -eq 0 ]; then
 	   eval "$__conda_setup"
     else
@@ -13,3 +19,5 @@ if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     fi
     unset __conda_setup
 fi
+
+export PATH=$PATH:/Users/simonjo/Library/Python/$PYTHON_VERSION/bin

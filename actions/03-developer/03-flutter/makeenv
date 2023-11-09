@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo "# This file is generated, do not edit."
+str=$(flutter --version)
+
+while [[ $str =~ (([A-Z][a-z]+) ([0-9]+\.[0-9]+\.[0-9]+)) ]]; do
+    name="$(echo ${BASH_REMATCH[2]} | tr '[a-z]' '[A-Z]')_VERSION"
+
+    echo "export $name=${BASH_REMATCH[3]}"
+
+    str=${str/"${BASH_REMATCH[1]}"/}
+done
+

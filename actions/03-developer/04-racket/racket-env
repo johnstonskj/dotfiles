@@ -1,5 +1,10 @@
-export RACKET_VERSION=$(ls -d /Applications/Racket* |cut -d "v" -f 2 |sort -n |tail -1)
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+############################################################################
+# Racket Scheme
+############################################################################
+
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
+   export RACKET_VERSION=$(ls -d /Applications/Racket* |cut -d "v" -f 2 |sort -n |tail -1)
    export RACKET_HOME=/Applications/Racket\ v$RACKET_VERSION
    export RACKET_USER=$HOME/Library/Racket/$RACKET_VERSION
    export PATH=$PATH:$RACKET_HOME/bin:$RACKET_USER/bin

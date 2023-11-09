@@ -1,0 +1,6 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+if app_installed MathStudio; then
+    app_path MathStudio __path
+    alias calc='open ${__path}'
+fi

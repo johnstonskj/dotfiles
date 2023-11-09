@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>homebrew.mxcl.emacs</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/emacs</string>
+		<string>--fg-daemon</string>
+        <string>--socket-name=/Users/simonjo/.emacs.d/server</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/MacGPG2/bin:/Applications/Wireshark.app/Contents/MacOS:/Users/simonjo/.cargo/bin:/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/3.1.0/bin:/Users/simonjo/anaconda/bin:/usr/local/anaconda3/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/bin:/Users/simonjo/bin:/Applications/kitty.app/Contents/MacOS:/Applications/Docker.app/Contents/Resources/bin:/Users/simonjo/local/gnat/2020/bin:/Users/simonjo/Library/Python/3.11.2/bin:/Applications/Racket v8.8/bin:/Users/simonjo/Library/Racket/8.8/bin:/Users/simonjo/.rvm/bin:/Applications/Xcode.app/Contents/Developer</string>
+    </dict>
+</dict>
+</plist>

@@ -1,8 +1,6 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# bat -- a better less
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
-fi
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"

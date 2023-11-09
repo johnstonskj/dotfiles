@@ -1,8 +1,8 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# bat -- a better less
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
-fi
+alias cat=bat
+alias battail='bat --paging=never -l log'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'

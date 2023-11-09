@@ -1,14 +1,10 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Set Environment
-############################################################################
-
-export DOCKER_HOME=/Applications/Docker.app/Contents/Resources
-export PATH=$PATH:$DOCKER_HOME/bin
-
-############################################################################
-# Set Aliases
+# Docker Desktop
 ############################################################################
 
-alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'
-alias docker-ubuntu='docker run -it ubuntu bash'
-
+if package_installed docker; then
+    app_path Docker DOCKER_HOME
+    export DOCKER_HOME="${DOCKER_HOME}/Contents/Resources"
+    export PATH=$PATH:$DOCKER_HOME/bin
+fi

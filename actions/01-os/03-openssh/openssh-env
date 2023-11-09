@@ -1,8 +1,8 @@
-# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+# -*- mode: sh-mode; -*-
 ############################################################################
-# Xcode
+# OpenSSL
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if package_installed openssl; then
+    export SSH_KEY_PATH="~/.ssh/rsa_id"
 fi

@@ -1,8 +1,8 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# Diceware password generator
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if package_installed diceware; then
+    alias pwgen='diceware -n 4 -s 2 -d " "'
 fi

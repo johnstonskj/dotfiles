@@ -1,0 +1,90 @@
+#############   -*- mode: sh; eval: (sh-set-shell "bash") -*-  #############
+#!/usr/bin/env bash
+
+############################################################################
+# Oh-My-Zsh useful tool
+############################################################################
+
+function usage {
+    local __exit="${1:-1}"
+    echo "Usage: $0 command [options]"
+    echo ""
+    echo "Commands:"
+    echo "    install 'github-user/plugin-name'"
+    echo "            | plugin-name plugin-url"
+    echo "    uninstall plugin-name"
+    echo ""
+}
+
+function install_custom_plugin {
+    local plugin_name=$1
+    local plugin_url=$2
+
+    if [[ -z "${plugin_name}" ]]; then
+        echo "Error: no plugin name specified"
+        usage 3
+    else
+        if [[ -z "${plugin_url}" ]]; then
+            plugin_url="https://github.com/${plugin_name}.git"
+            plugin_name=$(basename ${plugin_name})
+        fi
+        git clone "${plugin_url}" "${ZSH_CUSTOM}/plugins/${plugin_name}"
+    fi
+}
+
+function uninstall_custom_plugin {
+    local plugin_name=$1
+
+    if [[ -d "${ZSH_CUSTOM}/plugins/${plugin_name}" ]]; then
+         rm -r "${ZSH_CUSTOM}/plugins/${plugin_name}"
+    else
+        echo "Error: ${plugin_name} is not an installed plugin"
+        exit 4
+    fi
+}
+
+function list_custom_plugins {
+    ls "${ZSH_CUSTOM}/plugins"
+}
+
+if [[ -z "${ZSH_CUSTOM}" ]]; then
+    echo "Warning: no ZSH_CUSTOM environment variable set"
+    if [[ -z "${ZSH}" ]]; then
+        if [[ -d "${HOME}/.oh-my-zsh" ]]; then
+            ZSH="${HOME}/.oh-my-zsh"
+            ZSH_CUSTOM="${ZSH}/custom"
+        else
+            echo "Error: I can't find the oh-my-zsh home"
+            exit 10
+        fi
+    else
+        ZSH_CUSTOM="${ZSH}/custom"
+    fi
+    echo "... using default: ${ZSH_CUSTOM}"
+    echo ""
+fi
+
+case $1 in
+    install)
+        shift;
+        install_custom_plugin $@
+    ;;
+    uninstall)
+        shift;
+        uninstall_custom_plugin $@
+        ;;
+    list)
+        shift;
+        list_custom_plugins $@
+        ;;
+    help)
+        usage 0
+        ;;
+    "")
+        usage 1
+        ;;
+    *)
+        echo "Error: unknown command"
+        usage 2
+        ;;
+esac

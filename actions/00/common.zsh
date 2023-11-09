@@ -451,6 +451,16 @@ link_env_file() {
 	fi
 }
 
+link_aliases_file() {
+	if [[ $ACTION = (install|update|link) ]] ; then
+		make_dir "$LOCAL_CONFIG/$1"
+		link_file "$1-aliases" "$LOCAL_CONFIG/$1/aliases"
+	elif [[ $ACTION = (uninstall) ]] ; then
+		remove_file "$LOCAL_CONFIG/$1/aliases"
+		remove_dir "$LOCAL_CONFIG/$1"
+	fi
+}
+
 link_file() {
     if [[ $ACTION = (install|update|link) ]] ; then
 		if [[ -e "$CURR_ACTION/$1" ]] ; then

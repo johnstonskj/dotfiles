@@ -1,1 +1,8 @@
-export GPG_TTY=$(tty)
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+############################################################################
+# Gnu Privacy Guard (GPG)
+############################################################################
+
+if package_installed gpg; then
+    export GPG_TTY=$(tty)
+fi

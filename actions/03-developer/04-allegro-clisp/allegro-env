@@ -1,8 +1,10 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# Allegro Common Lisp Express
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if app_installed "AllegroCL64express"; then
+    app_path "AllegroCL64express" ACL_HOME
+    export ACL_HOME="${ACL_HOME}/Contents/Resources"
+    export PATH={ACL_HOME}:${PATH}
 fi

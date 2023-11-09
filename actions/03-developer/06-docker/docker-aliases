@@ -1,8 +1,9 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# Docker Desktop
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if package_installed docker; then
+    alias amazon-linux='docker run -it amazonlinux:latest /bin/bash'
+    alias docker-ubuntu='docker run -it ubuntu bash'
 fi

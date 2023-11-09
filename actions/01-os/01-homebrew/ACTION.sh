@@ -9,5 +9,3 @@ if [[ $ACTION = update && $OSSYS = macos ]] ; then
     run_command $INSTALLER cleanup
     # and maybe ... $INSTALLER doctor
 fi
-
-link_file brew $LOCAL_CONFIG/brew/_env

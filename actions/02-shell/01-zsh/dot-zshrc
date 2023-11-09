@@ -1,43 +1,120 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 
+log_scope_enter "zshrc"
+
+############################################################################
+# Zsh Functions
+############################################################################
+
+log_scope_enter "functions"
+
+if [[ -d "${HOMEBREW_PREFIX}/share/zsh/functions" ]]; then
+    export FPATH="${HOMEBREW_PREFIX}/share/zsh/functions":$FPATH
+fi
+
+if [[ -d "${HOMEBREW_PREFIX}/share/zsh/site-functions" ]]; then
+    export FPATH="${HOMEBREW_PREFIX}/share/zsh/site-functions":$FPATH
+fi
+
+log_debug "FPATH=${FPATH}"
+
+log_scope_exit "functions"
+
 ############################################################################
 # Oh-My Zsh
 ############################################################################
 
-export ZSH="$HOME/.oh-my-zsh"
+log_scope_enter "oh-my-zsh"
+
+export ZSH="${HOME}/.oh-my-zsh"
+export ZSH_CUSTOM="${ZSH}/custom"
 
 # ########## Flags
 
 ENABLE_CORRECTION="true"
-
 COMPLETION_WAITING_DOTS="true"
 
 # ########## Plugins
 
-plugins=(git github gnu-utils rust)
+plugins=(
+    brew
+    emacs
+    git
+    git-commit
+    git-extras
+    github
+    gnu-utils
+    rust
+    vscode
+    zsh-autosuggestions
+    zsh-completions
+    # log-lines # Use this for debugging
+    zsh-navigation-tools
+)
 
 if [[ $OSTYPE = (darwin|freebsd)* ]] ; then
     plugins+=(macos)
 fi
 
-source $ZSH/oh-my-zsh.sh
+log_debug "plugins: ${plugins[@]}"
+
+source "${ZSH}/oh-my-zsh.sh"
+
+log_scope_exit "oh-my-zsh"
 
 ############################################################################
 # Aliases
 ############################################################################
 
+log_scope_enter "aliases"
+
 alias hd='od -tcx1'
 alias myip='curl http://ipecho.net/plain; echo'
 alias todo="find . -type f | xargs grep -n 'TODO:' | $SED $'1i\\\\\nFILE:LINE:MEMO:COMMENT\n' | $SED -r 's/:[ ]+[^T]*/:/' | column -t -s ':'"
 alias weather='curl wttr.in'
-alias wtf='wtfutil'
-alias gh-token='bw get item Github | jq -r ".fields[0] .value"'
+
+log_scope_enter "package-aliases"
+
+for dir in ${XDG_CONFIG_HOME}/*; do
+    if [[ -f "${dir}/aliases" ]] ; then
+        log_scope_enter "$(basename ${dir})"
+        source "${dir}/aliases"
+        log_scope_exit "$(basename ${dir})"
+    fi
+done
+
+log_scope_exit "package-aliases"
+
+log_scope_exit "aliases"
+
+############################################################################
+# Additional Completion Functions
+############################################################################
+
+log_scope_enter "package-completions"
+
+for dir in ${XDG_CONFIG_HOME}/*; do
+    local name=$(basename ${dir})
+    if [[ -f "${dir}/completions/${name}.zsh" ]] ; then
+        log_scope_enter "$(basename ${dir})"
+        export FPATH="${FPATH}:${dir}/completions"
+        log_scope_exit "$(basename ${dir})"
+    fi
+done
+
+autoload -Uz compinit && compinit
+
+log_scope_exit "package-completions"
 
 ############################################################################
 # Starship prompt
 ############################################################################
 
+log_scope_enter "prompt"
+
 eval "$(starship init zsh)"
+
+log_scope_exit "prompt"
 
 ############################################################################
 # Just in case......
@@ -46,3 +123,5 @@ eval "$(starship init zsh)"
 if [ -e "$HOME/.zshrc-work" ] ; then
     source "$HOME/.zshrc-work"
 fi
+
+log_scope_exit "zshrc"

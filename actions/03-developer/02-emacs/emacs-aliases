@@ -1,8 +1,9 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# Emacs
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if package_installed emacs; then
+    alias emacs='emacsclient -nw'
+    alias gemacs='emacsclient -c'
 fi

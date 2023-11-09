@@ -1,8 +1,8 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 ############################################################################
-# Xcode
+# The InterPlanetary File System
 ############################################################################
 
-if [[ ${OSTYPE} == darwin* ]] ; then
-    export PATH="${PATH}:$(xcode-select -p)"
+if package_installed ipfs; then
+    alias ipfsui='open http://localhost:5001/webui'
 fi

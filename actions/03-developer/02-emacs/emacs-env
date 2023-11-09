@@ -1,5 +1,9 @@
-export ALTERNATE_EDITOR=""
-export EMACS_CONF=$HOME/.emacs.d
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+############################################################################
+# Emacs
+############################################################################
 
-alias emacs='emacsclient -nw'
-alias gemacs='emacsclient -c'
+if package_installed emacs; then
+    export ALTERNATE_EDITOR=""
+    export EMACS_CONF=$HOME/.emacs.d
+fi

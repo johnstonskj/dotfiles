@@ -1,5 +1,7 @@
 # dotfiles
 
+This repository is **deprecated** as I use a more modular approach captured in [johnstonskj/Config](https://github.com/johnstonskj/dotfiles/tree/main).
+
 This repo is a little more than the traditional set of configuration files. It's designed to actually get a pretty bare-bones machine to the state I like for development. To do this it not only links in the set of config files but also installs the relevant software, any environment customizations and builds. It also works on macos and Ubuntu (and minor testing on Redhat), and has hooks in this repo to pull in an equivalent set of work-specific actions.
 
 ## Setup Action Structure
